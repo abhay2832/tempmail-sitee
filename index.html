@@ -3,36 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Habit Tracker - Dark Mode</title>
+    <title>Ultimate Habit Tracker</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --bg-color: #0b1021;
-            --panel-bg: #151c33;
-            --text-main: #ffffff;
-            --text-muted: #8b95b1;
-            --accent-blue: #00d2ff;
-            --accent-green: #00e676;
-            --accent-pink: #ff4081;
-            --border-color: #2a3556;
+            --bg-dark: #0f172a;
+            --panel-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-green: #10b981;
+            --accent-red: #f43f5e;
+            --accent-blue: #0ea5e9;
+            --accent-purple: #8b5cf6;
+            --border-color: #334155;
         }
 
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background-color: var(--bg-color);
+            background-color: var(--bg-dark);
             color: var(--text-main);
             padding: 20px;
         }
 
-        .dashboard {
-            max-width: 1200px;
+        .dashboard-container {
+            max-width: 1400px;
             margin: 0 auto;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 20px;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
             display: flex;
             flex-direction: column;
             gap: 20px;
@@ -42,81 +50,105 @@
             background-color: var(--panel-bg);
             border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
             border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         }
 
-        .top-section {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 20px;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-
-        .stat-box {
-            background: rgba(255,255,255,0.03);
-            padding: 15px;
-            border-radius: 8px;
+        .stats-box {
             text-align: center;
-            border: 1px solid var(--border-color);
+            margin-bottom: 15px;
+            padding: 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
         }
 
-        .stat-box h3 {
-            color: var(--text-muted);
+        .stats-box h3 {
             font-size: 12px;
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 5px;
         }
 
-        .stat-box .value {
-            font-size: 24px;
+        .stats-box .value {
+            font-size: 28px;
             font-weight: bold;
-            color: var(--accent-blue);
+        }
+
+        .val-green { color: var(--accent-green); }
+        .val-red { color: var(--accent-red); }
+
+        /* Main Content Styles */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .top-widgets {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+        }
+
+        .circle-progress {
+            text-align: center;
+        }
+
+        .circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 6px solid var(--border-color);
+            border-top-color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 auto 10px auto;
         }
 
         .chart-container {
-            position: relative;
-            height: 200px;
+            height: 250px;
             width: 100%;
+            padding: 10px;
         }
 
-        .tracker-header {
+        /* Table Styles */
+        .table-controls {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 15px;
         }
 
-        .tracker-header input {
-            background: transparent;
+        .table-controls input {
+            background-color: var(--bg-dark);
             border: 1px solid var(--border-color);
             color: white;
-            padding: 8px 15px;
-            border-radius: 5px;
-            width: 250px;
+            padding: 10px 15px;
+            border-radius: 6px;
+            width: 300px;
+            outline: none;
         }
 
-        .tracker-header button {
-            background: var(--accent-blue);
-            color: #000;
+        .table-controls button {
+            background-color: var(--accent-blue);
+            color: white;
             border: none;
-            padding: 8px 20px;
-            border-radius: 5px;
-            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 6px;
             cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
         }
 
-        .tracker-header button:hover {
-            background: #00b8e6;
+        .table-controls button:hover {
+            background-color: #0284c7;
         }
 
-        .table-container {
+        .table-wrapper {
             overflow-x: auto;
         }
 
@@ -128,195 +160,224 @@
 
         th, td {
             border: 1px solid var(--border-color);
-            padding: 8px 4px;
+            padding: 6px 4px;
             text-align: center;
-            min-width: 30px;
         }
 
         th {
+            background-color: rgba(255,255,255,0.02);
             color: var(--text-muted);
-            font-weight: normal;
+            font-weight: 600;
         }
 
-        .habit-name {
+        .habit-name-cell {
             text-align: left;
-            min-width: 150px;
-            padding-left: 10px;
+            padding-left: 12px;
+            min-width: 180px;
             color: var(--text-main);
-            font-weight: 500;
         }
 
-        /* Custom Checkbox */
-        input[type="checkbox"] {
+        /* Custom Checkboxes */
+        .check-grid input[type="checkbox"] {
             appearance: none;
+            width: 18px;
+            height: 18px;
             background-color: transparent;
-            border: 1px solid var(--text-muted);
-            width: 16px;
-            height: 16px;
-            border-radius: 3px;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            transition: 0.2s;
         }
 
-        input[type="checkbox"]:checked {
+        .check-grid input[type="checkbox"]:checked {
             background-color: var(--accent-green);
             border-color: var(--accent-green);
         }
 
-        .progress-cell {
-            min-width: 80px;
-            color: var(--accent-blue);
-            font-weight: bold;
+        .delete-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .delete-btn:hover {
+            color: var(--accent-red);
+        }
+
+        .progress-bar-bg {
+            background-color: var(--border-color);
+            height: 6px;
+            border-radius: 3px;
+            width: 100%;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background-color: var(--accent-blue);
+            width: 0%;
+            transition: width 0.3s;
         }
     </style>
 </head>
 <body>
 
-    <div class="dashboard">
-        <div class="top-section">
-            <div class="panel stats-grid">
-                <div class="stat-box">
-                    <h3>Completed</h3>
-                    <div class="value" id="totalCompleted">0</div>
-                </div>
-                <div class="stat-box">
-                    <h3>Remaining</h3>
-                    <div class="value" style="color: var(--accent-pink);" id="totalRemaining">0</div>
-                </div>
-                <div class="stat-box">
-                    <h3>Daily Progress</h3>
-                    <div class="value" style="color: var(--accent-green);" id="dailyAvg">0%</div>
-                </div>
-                <div class="stat-box">
-                    <h3>Total Habits</h3>
-                    <div class="value" id="totalHabitsStat">0</div>
-                </div>
-            </div>
-            
+    <div class="dashboard-container">
+        <div class="sidebar">
             <div class="panel">
-                <h3 style="color: var(--text-muted); margin-bottom: 10px; font-size: 14px; text-transform: uppercase;">Daily Progress Overview</h3>
-                <div class="chart-container">
-                    <canvas id="progressChart"></canvas>
+                <h2 style="text-align: center; margin-bottom: 20px; color: var(--accent-blue);">August 2024</h2>
+                <div class="stats-box">
+                    <h3>Total Habits</h3>
+                    <div class="value" id="totalHabits">0</div>
+                </div>
+                <div class="stats-box">
+                    <h3>Completed</h3>
+                    <div class="value val-green" id="totalCompleted">0</div>
+                </div>
+                <div class="stats-box">
+                    <h3>Remaining</h3>
+                    <div class="value val-red" id="totalRemaining">0</div>
                 </div>
             </div>
         </div>
 
-        <div class="panel">
-            <div class="tracker-header">
-                <h2 style="font-size: 18px; color: var(--text-main);">DAILY HABITS</h2>
-                <div>
-                    <input type="text" id="habitInput" placeholder="Enter new habit...">
-                    <button onclick="addHabit()">Add Habit</button>
+        <div class="main-content">
+            <div class="panel">
+                <div class="top-widgets">
+                    <div class="circle-progress">
+                        <div class="circle" id="momentumCircle">0%</div>
+                        <span style="color: var(--text-muted); font-size: 12px; text-transform: uppercase;">Daily Progress</span>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="progressChart"></canvas>
                 </div>
             </div>
-            
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr id="tableHeader">
-                            <th class="habit-name">Habit Name</th>
-                            <th>Progress</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tableBody">
-                        </tbody>
-                </table>
+
+            <div class="panel">
+                <div class="table-controls">
+                    <h3 style="color: var(--text-muted); text-transform: uppercase; font-size: 14px;">Daily Habits Tracking</h3>
+                    <div>
+                        <input type="text" id="newHabit" placeholder="Enter habit name...">
+                        <button onclick="addHabit()">+ Add</button>
+                    </div>
+                </div>
+                
+                <div class="table-wrapper">
+                    <table class="check-grid">
+                        <thead>
+                            <tr id="daysHeader">
+                                <th class="habit-name-cell">Habit</th>
+                                <th>%</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="trackerBody">
+                            </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        const daysInMonth = 31;
-        let habits = JSON.parse(localStorage.getItem('ultimateHabits')) || [];
-        let progressChartInstance = null;
+        const DAYS = 31;
+        let habitsData = JSON.parse(localStorage.getItem('proHabits')) || [];
+        let chartInstance = null;
 
-        function init() {
-            generateHeaders();
-            renderHabits();
+        function initApp() {
+            buildTableHeaders();
+            renderTable();
         }
 
-        function generateHeaders() {
-            const headerRow = document.getElementById('tableHeader');
-            for (let i = 1; i <= daysInMonth; i++) {
+        function buildTableHeaders() {
+            const tr = document.getElementById('daysHeader');
+            for(let i = 1; i <= DAYS; i++) {
                 const th = document.createElement('th');
                 th.innerText = i;
-                headerRow.insertBefore(th, headerRow.children[i]);
+                tr.insertBefore(th, tr.children[i]);
             }
         }
 
-        function renderHabits() {
-            const tbody = document.getElementById('tableBody');
+        function renderTable() {
+            const tbody = document.getElementById('trackerBody');
             tbody.innerHTML = '';
             
-            let totalCompletedTicks = 0;
-            let dailyCompletionCounts = new Array(daysInMonth).fill(0);
+            let globalCompleted = 0;
+            let dailyData = new Array(DAYS).fill(0);
 
-            habits.forEach((habit, index) => {
+            habitsData.forEach((habit, hIndex) => {
                 const tr = document.createElement('tr');
-                let html = `<td class="habit-name">${habit.name}</td>`;
                 
-                let checkedCount = 0;
-                for (let i = 0; i < daysInMonth; i++) {
-                    const isChecked = habit.days[i] ? 'checked' : '';
-                    if(habit.days[i]) {
-                        checkedCount++;
-                        totalCompletedTicks++;
-                        dailyCompletionCounts[i]++;
+                let rowHtml = `<td class="habit-name-cell">${habit.name}</td>`;
+                let rowCompleted = 0;
+
+                for(let d = 0; d < DAYS; d++) {
+                    const isChecked = habit.ticks[d] ? 'checked' : '';
+                    if(habit.ticks[d]) {
+                        rowCompleted++;
+                        globalCompleted++;
+                        dailyData[d]++;
                     }
-                    html += `<td><input type="checkbox" ${isChecked} onchange="toggleDay(${index}, ${i})"></td>`;
+                    rowHtml += `<td><input type="checkbox" ${isChecked} onchange="toggleTick(${hIndex}, ${d})"></td>`;
                 }
 
-                const progressPercentage = Math.round((checkedCount / daysInMonth) * 100);
-                
-                html += `
-                    <td class="progress-cell">${progressPercentage}%</td>
-                    <td><button onclick="deleteHabit(${index})" style="background:transparent; border:none; color:var(--accent-pink); cursor:pointer;">✖</button></td>
+                const percent = Math.round((rowCompleted / DAYS) * 100);
+
+                rowHtml += `
+                    <td>
+                        <div style="font-weight: bold; color: var(--accent-blue);">${percent}%</div>
+                        <div class="progress-bar-bg"><div class="progress-bar-fill" style="width: ${percent}%;"></div></div>
+                    </td>
+                    <td><button class="delete-btn" onclick="removeHabit(${hIndex})">🗑️</button></td>
                 `;
-                
-                tr.innerHTML = html;
+
+                tr.innerHTML = rowHtml;
                 tbody.appendChild(tr);
             });
 
-            updateStats(totalCompletedTicks);
-            updateChart(dailyCompletionCounts);
+            updateDashboardStats(globalCompleted, dailyData);
         }
 
-        function updateStats(completedCount) {
-            const totalPossible = habits.length * daysInMonth;
-            const remaining = totalPossible > 0 ? totalPossible - completedCount : 0;
-            const avg = totalPossible > 0 ? Math.round((completedCount / totalPossible) * 100) : 0;
+        function updateDashboardStats(completed, dailyData) {
+            const total = habitsData.length * DAYS;
+            const remaining = total > 0 ? total - completed : 0;
+            const avgPercent = total > 0 ? Math.round((completed / total) * 100) : 0;
 
-            document.getElementById('totalCompleted').innerText = completedCount;
+            document.getElementById('totalHabits').innerText = habitsData.length;
+            document.getElementById('totalCompleted').innerText = completed;
             document.getElementById('totalRemaining').innerText = remaining;
-            document.getElementById('dailyAvg').innerText = avg + '%';
-            document.getElementById('totalHabitsStat').innerText = habits.length;
+            
+            const circle = document.getElementById('momentumCircle');
+            circle.innerText = avgPercent + '%';
+            circle.style.borderTopColor = avgPercent > 50 ? 'var(--accent-green)' : 'var(--accent-blue)';
+
+            drawChart(dailyData);
         }
 
-        function updateChart(dailyData) {
+        function drawChart(dataArray) {
             const ctx = document.getElementById('progressChart').getContext('2d');
-            const labels = Array.from({length: daysInMonth}, (_, i) => i + 1);
+            const labels = Array.from({length: DAYS}, (_, i) => i + 1);
 
-            if (progressChartInstance) {
-                progressChartInstance.destroy();
-            }
+            if(chartInstance) chartInstance.destroy();
 
-            progressChartInstance = new Chart(ctx, {
+            chartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Habits Completed',
-                        data: dailyData,
-                        borderColor: '#00e676',
-                        backgroundColor: 'rgba(0, 230, 118, 0.1)',
-                        borderWidth: 2,
+                        label: 'Completed Habits',
+                        data: dataArray,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                        borderWidth: 3,
                         fill: true,
-                        tension: 0.4,
-                        pointRadius: 2,
-                        pointBackgroundColor: '#00e676'
+                        tension: 0.3,
+                        pointBackgroundColor: '#10b981',
+                        pointRadius: 3
                     }]
                 },
                 options: {
@@ -325,48 +386,46 @@
                     scales: {
                         y: { 
                             beginAtZero: true, 
-                            max: habits.length > 0 ? habits.length : 1,
-                            ticks: { color: '#8b95b1', stepSize: 1 },
-                            grid: { color: 'rgba(42, 53, 86, 0.5)' }
+                            max: habitsData.length > 0 ? habitsData.length : 1,
+                            grid: { color: '#334155' },
+                            ticks: { color: '#94a3b8', stepSize: 1 }
                         },
                         x: { 
-                            ticks: { color: '#8b95b1' },
-                            grid: { display: false }
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8' }
                         }
                     },
-                    plugins: {
-                        legend: { display: false }
-                    }
+                    plugins: { legend: { display: false } }
                 }
             });
         }
 
         function addHabit() {
-            const input = document.getElementById('habitInput');
-            const habitName = input.value.trim();
-            if (habitName !== '') {
-                habits.push({ name: habitName, days: new Array(daysInMonth).fill(false) });
+            const input = document.getElementById('newHabit');
+            const val = input.value.trim();
+            if(val) {
+                habitsData.push({ name: val, ticks: new Array(DAYS).fill(false) });
                 input.value = '';
-                saveAndRender();
+                saveData();
             }
         }
 
-        function toggleDay(habitIndex, dayIndex) {
-            habits[habitIndex].days[dayIndex] = !habits[habitIndex].days[dayIndex];
-            saveAndRender();
+        function toggleTick(hIndex, dIndex) {
+            habitsData[hIndex].ticks[dIndex] = !habitsData[hIndex].ticks[dIndex];
+            saveData();
         }
 
-        function deleteHabit(habitIndex) {
-            habits.splice(habitIndex, 1);
-            saveAndRender();
+        function removeHabit(index) {
+            habitsData.splice(index, 1);
+            saveData();
         }
 
-        function saveAndRender() {
-            localStorage.setItem('ultimateHabits', JSON.stringify(habits));
-            renderHabits();
+        function saveData() {
+            localStorage.setItem('proHabits', JSON.stringify(habitsData));
+            renderTable();
         }
 
-        init();
+        initApp();
     </script>
 </body>
 </html>
