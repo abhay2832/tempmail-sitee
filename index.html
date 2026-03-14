@@ -3,129 +3,235 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Habit Tracker</title>
+    <title>Ultimate Habit Tracker - Dark Mode</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        :root {
+            --bg-color: #0b1021;
+            --panel-bg: #151c33;
+            --text-main: #ffffff;
+            --text-muted: #8b95b1;
+            --accent-blue: #00d2ff;
+            --accent-green: #00e676;
+            --accent-pink: #ff4081;
+            --border-color: #2a3556;
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+
         body {
-            background-color: #f4f9f6;
-            color: #333;
+            background-color: var(--bg-color);
+            color: var(--text-main);
             padding: 20px;
-            text-align: center;
         }
-        h1 {
-            color: #2c5e4f;
-            margin-bottom: 20px;
-        }
-        .tracker-container {
-            max-width: 1000px;
+
+        .dashboard {
+            max-width: 1200px;
             margin: 0 auto;
-            background: white;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .panel {
+            background-color: var(--panel-bg);
+            border-radius: 12px;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color);
+        }
+
+        .top-section {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .stat-box {
+            background: rgba(255,255,255,0.03);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .stat-box h3 {
+            color: var(--text-muted);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .stat-box .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--accent-blue);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 200px;
+            width: 100%;
+        }
+
+        .tracker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .tracker-header input {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            width: 250px;
+        }
+
+        .tracker-header button {
+            background: var(--accent-blue);
+            color: #000;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .tracker-header button:hover {
+            background: #00b8e6;
+        }
+
+        .table-container {
             overflow-x: auto;
         }
-        .add-habit-section {
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
-        input[type="text"] {
-            padding: 10px;
-            width: 250px;
-            border: 1px solid #b8d8c8;
-            border-radius: 5px;
-            outline: none;
-        }
-        button {
-            padding: 10px 20px;
-            background-color: #7ab59a;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        button:hover {
-            background-color: #5c967b;
-        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
+            font-size: 13px;
         }
+
         th, td {
-            border: 1px solid #e0e0e0;
-            padding: 10px;
+            border: 1px solid var(--border-color);
+            padding: 8px 4px;
             text-align: center;
+            min-width: 30px;
         }
+
         th {
-            background-color: #e8f3ee;
-            color: #4a7c68;
-            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: normal;
         }
+
         .habit-name {
             text-align: left;
-            font-weight: bold;
             min-width: 150px;
-            color: #333;
+            padding-left: 10px;
+            color: var(--text-main);
+            font-weight: 500;
         }
-        .progress-bar-container {
-            width: 100%;
-            background-color: #e0e0e0;
-            border-radius: 5px;
-            overflow: hidden;
-            height: 15px;
-            margin-top: 5px;
+
+        /* Custom Checkbox */
+        input[type="checkbox"] {
+            appearance: none;
+            background-color: transparent;
+            border: 1px solid var(--text-muted);
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .progress-bar {
-            height: 100%;
-            background-color: #7ab59a;
-            width: 0%;
-            transition: width 0.3s ease;
+
+        input[type="checkbox"]:checked {
+            background-color: var(--accent-green);
+            border-color: var(--accent-green);
         }
-        .delete-btn {
-            background-color: #ff6b6b;
-            padding: 5px 10px;
-            font-size: 12px;
-        }
-        .delete-btn:hover {
-            background-color: #ee5253;
+
+        .progress-cell {
+            min-width: 80px;
+            color: var(--accent-blue);
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <h1>✨ The Ultimate Habit Tracker ✨</h1>
-    
-    <div class="tracker-container">
-        <div class="add-habit-section">
-            <input type="text" id="habitInput" placeholder="Nayi habit likho (e.g., Morning Run)...">
-            <button onclick="addHabit()">Add Habit</button>
+    <div class="dashboard">
+        <div class="top-section">
+            <div class="panel stats-grid">
+                <div class="stat-box">
+                    <h3>Completed</h3>
+                    <div class="value" id="totalCompleted">0</div>
+                </div>
+                <div class="stat-box">
+                    <h3>Remaining</h3>
+                    <div class="value" style="color: var(--accent-pink);" id="totalRemaining">0</div>
+                </div>
+                <div class="stat-box">
+                    <h3>Daily Progress</h3>
+                    <div class="value" style="color: var(--accent-green);" id="dailyAvg">0%</div>
+                </div>
+                <div class="stat-box">
+                    <h3>Total Habits</h3>
+                    <div class="value" id="totalHabitsStat">0</div>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h3 style="color: var(--text-muted); margin-bottom: 10px; font-size: 14px; text-transform: uppercase;">Daily Progress Overview</h3>
+                <div class="chart-container">
+                    <canvas id="progressChart"></canvas>
+                </div>
+            </div>
         </div>
 
-        <table id="trackerTable">
-            <thead>
-                <tr id="tableHeader">
-                    <th>Habit</th>
-                    <th>Progress</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                </tbody>
-        </table>
+        <div class="panel">
+            <div class="tracker-header">
+                <h2 style="font-size: 18px; color: var(--text-main);">DAILY HABITS</h2>
+                <div>
+                    <input type="text" id="habitInput" placeholder="Enter new habit...">
+                    <button onclick="addHabit()">Add Habit</button>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr id="tableHeader">
+                            <th class="habit-name">Habit Name</th>
+                            <th>Progress</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <script>
         const daysInMonth = 31;
-        let habits = JSON.parse(localStorage.getItem('myHabits')) || [];
+        let habits = JSON.parse(localStorage.getItem('ultimateHabits')) || [];
+        let progressChartInstance = null;
 
         function init() {
             generateHeaders();
@@ -134,11 +240,6 @@
 
         function generateHeaders() {
             const headerRow = document.getElementById('tableHeader');
-            // Remove existing day headers if any
-            while (headerRow.children.length > 3) {
-                headerRow.removeChild(headerRow.children[1]);
-            }
-            // Add 1 to 31 columns
             for (let i = 1; i <= daysInMonth; i++) {
                 const th = document.createElement('th');
                 th.innerText = i;
@@ -149,36 +250,94 @@
         function renderHabits() {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
+            
+            let totalCompletedTicks = 0;
+            let dailyCompletionCounts = new Array(daysInMonth).fill(0);
 
             habits.forEach((habit, index) => {
                 const tr = document.createElement('tr');
-                
-                // Habit Name
                 let html = `<td class="habit-name">${habit.name}</td>`;
                 
-                // 31 Checkboxes
                 let checkedCount = 0;
                 for (let i = 0; i < daysInMonth; i++) {
                     const isChecked = habit.days[i] ? 'checked' : '';
-                    if(habit.days[i]) checkedCount++;
+                    if(habit.days[i]) {
+                        checkedCount++;
+                        totalCompletedTicks++;
+                        dailyCompletionCounts[i]++;
+                    }
                     html += `<td><input type="checkbox" ${isChecked} onchange="toggleDay(${index}, ${i})"></td>`;
                 }
 
-                // Progress Calculation
                 const progressPercentage = Math.round((checkedCount / daysInMonth) * 100);
                 
                 html += `
-                    <td>
-                        <span>${progressPercentage}%</span>
-                        <div class="progress-bar-container">
-                            <div class="progress-bar" style="width: ${progressPercentage}%"></div>
-                        </div>
-                    </td>
-                    <td><button class="delete-btn" onclick="deleteHabit(${index})">Delete</button></td>
+                    <td class="progress-cell">${progressPercentage}%</td>
+                    <td><button onclick="deleteHabit(${index})" style="background:transparent; border:none; color:var(--accent-pink); cursor:pointer;">✖</button></td>
                 `;
                 
                 tr.innerHTML = html;
                 tbody.appendChild(tr);
+            });
+
+            updateStats(totalCompletedTicks);
+            updateChart(dailyCompletionCounts);
+        }
+
+        function updateStats(completedCount) {
+            const totalPossible = habits.length * daysInMonth;
+            const remaining = totalPossible > 0 ? totalPossible - completedCount : 0;
+            const avg = totalPossible > 0 ? Math.round((completedCount / totalPossible) * 100) : 0;
+
+            document.getElementById('totalCompleted').innerText = completedCount;
+            document.getElementById('totalRemaining').innerText = remaining;
+            document.getElementById('dailyAvg').innerText = avg + '%';
+            document.getElementById('totalHabitsStat').innerText = habits.length;
+        }
+
+        function updateChart(dailyData) {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            const labels = Array.from({length: daysInMonth}, (_, i) => i + 1);
+
+            if (progressChartInstance) {
+                progressChartInstance.destroy();
+            }
+
+            progressChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Habits Completed',
+                        data: dailyData,
+                        borderColor: '#00e676',
+                        backgroundColor: 'rgba(0, 230, 118, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 2,
+                        pointBackgroundColor: '#00e676'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            max: habits.length > 0 ? habits.length : 1,
+                            ticks: { color: '#8b95b1', stepSize: 1 },
+                            grid: { color: 'rgba(42, 53, 86, 0.5)' }
+                        },
+                        x: { 
+                            ticks: { color: '#8b95b1' },
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
             });
         }
 
@@ -186,10 +345,7 @@
             const input = document.getElementById('habitInput');
             const habitName = input.value.trim();
             if (habitName !== '') {
-                habits.push({
-                    name: habitName,
-                    days: new Array(daysInMonth).fill(false)
-                });
+                habits.push({ name: habitName, days: new Array(daysInMonth).fill(false) });
                 input.value = '';
                 saveAndRender();
             }
@@ -206,13 +362,11 @@
         }
 
         function saveAndRender() {
-            localStorage.setItem('myHabits', JSON.stringify(habits));
+            localStorage.setItem('ultimateHabits', JSON.stringify(habits));
             renderHabits();
         }
 
-        // Initialize the app
         init();
     </script>
-
 </body>
 </html>
