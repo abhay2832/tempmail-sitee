@@ -3,396 +3,310 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Habit Tracker - Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>TempMail Pro - Free Disposable Email</title>
+    <meta name="description" content="Free temporary disposable email service. Protect your real inbox from spam!">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --bg-color: #1a233a;
-            --panel-bg: #222e4c;
-            --text-main: #ffffff;
-            --text-muted: #8a98bd;
-            --border-color: #2e3d60;
-            
-            --cyan: #00d2ff;
-            --green: #00e676;
-            --purple: #8e24aa;
-            --yellow: #ffea00;
-            --pink: #ff4081;
-            --red: #ff5252;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            padding: 20px;
-            font-size: 13px;
-        }
-
-        .dashboard {
-            max-width: 1500px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        /* Top Section Layout */
-        .top-section {
-            display: grid;
-            grid-template-columns: 250px 1fr 300px;
-            gap: 15px;
-        }
-
-        .panel {
-            background-color: var(--panel-bg);
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            padding: 15px;
-        }
-
-        /* Left Panel */
-        .month-title { font-size: 28px; margin-bottom: 20px; color: var(--text-main); }
-        .stats-row { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; }
-        .stats-label { color: var(--text-muted); }
-        
-        .big-stat-box {
-            text-align: center;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 15px;
-            border: 1px solid var(--border-color);
-        }
-        .completed-box { background: rgba(0, 230, 118, 0.1); }
-        .completed-box .value { color: var(--green); font-size: 24px; font-weight: bold; }
-        .remaining-box { background: rgba(255, 82, 82, 0.1); }
-        .remaining-box .value { color: var(--red); font-size: 24px; font-weight: bold; }
-
-        /* Center Panel - Circles & Chart */
-        .circles-container {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 20px;
-        }
-        .circle-wrap { text-align: center; }
-        .circle {
-            width: 70px; height: 70px;
-            border-radius: 50%;
-            border: 5px solid var(--border-color);
-            border-top-color: var(--green);
-            display: flex; align-items: center; justify-content: center;
-            font-weight: bold; font-size: 16px; margin: 0 auto 10px;
-        }
-        .chart-wrap { height: 220px; width: 100%; }
-
-        /* Right Panel - Mini Bars */
-        .mini-section-title { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 15px; text-align: center;}
-        .mini-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 11px;}
-        .mini-bar-name { width: 80px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .mini-bar-bg { flex: 1; height: 12px; background: var(--border-color); border-radius: 2px; }
-        .mini-bar-fill { height: 100%; border-radius: 2px; }
-
-        /* Bottom Grid */
-        .grid-panel { overflow-x: auto; padding: 0; border: none; background: transparent;}
-        table { border-collapse: collapse; width: 100%; background: var(--panel-bg); }
-        
-        /* Week Colors */
-        .wk1 { background-color: rgba(0, 210, 255, 0.15); border-color: var(--cyan); }
-        .wk2 { background-color: rgba(0, 230, 118, 0.15); border-color: var(--green); }
-        .wk3 { background-color: rgba(142, 36, 170, 0.15); border-color: var(--purple); }
-        .wk4 { background-color: rgba(255, 234, 0, 0.15); border-color: var(--yellow); }
-        .wk5 { background-color: rgba(255, 64, 129, 0.15); border-color: var(--pink); }
-
-        th, td { border: 1px solid var(--border-color); padding: 4px; text-align: center; min-width: 25px; height: 28px;}
-        .habit-col { width: 250px; text-align: left; padding-left: 10px; font-weight: 500; background: var(--panel-bg); position: sticky; left: 0; z-index: 2; border-right: 2px solid var(--bg-color);}
-        
-        .week-header th { color: #000; font-weight: bold; font-size: 10px; padding: 2px; }
-        .day-header th { font-size: 10px; color: var(--text-muted); }
-        
-        input[type="checkbox"] {
-            appearance: none; width: 14px; height: 14px; background: var(--bg-color);
-            border: 1px solid var(--text-muted); border-radius: 2px; cursor: pointer;
-        }
-        input[type="checkbox"]:checked { background: currentColor; border-color: currentColor; }
-        
-        .prog-text { font-weight: bold; width: 40px; }
-        .streak-col { width: 40px; color: var(--cyan); font-weight: bold; }
-        
-        /* Add Habit Input */
-        .add-row td { padding: 10px; }
-        .add-input { width: 100%; padding: 5px; background: var(--bg-color); border: 1px solid var(--border-color); color: white; }
-        .add-btn { background: var(--cyan); color: #000; border: none; padding: 5px 10px; font-weight: bold; cursor: pointer; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .email-glow { box-shadow: 0 0 30px rgba(102, 126, 234, 0.4); }
+        @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); } 50% { box-shadow: 0 0 40px rgba(59, 130, 246, 0.8); } }
+        .pulse-glow { animation: pulse-glow 2s infinite; }
+        .fade-in { animation: fadeIn 0.6s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body>
+<body class="bg-gradient-bg min-h-screen text-white">
+    
+    <!-- Header -->
+    <nav class="backdrop-blur-md bg-white/10 sticky top-0 z-50 border-b border-white/20">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                    <i class="fa-solid fa-envelope text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold">TempMail Pro</h1>
+                    <p class="text-xs opacity-80">Disposable Email Service</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="toggleTheme()" class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-all">
+                    <i id="theme-icon" class="fa-solid fa-moon"></i>
+                </button>
+                <button onclick="generateNewEmail()" class="px-6 py-2 bg-white/20 backdrop-blur-sm rounded-xl font-semibold hover:bg-white/30 transition-all">
+                    <i class="fa-solid fa-plus mr-2"></i>New
+                </button>
+            </div>
+        </div>
+    </nav>
 
-    <div class="dashboard">
+    <div class="max-w-4xl mx-auto px-6 py-12">
         
-        <div class="top-section">
-            <div class="panel">
-                <div class="month-title">August</div>
-                <div style="font-size: 10px; color: var(--text-muted); margin-bottom: 15px;">- HABIT TRACKER -</div>
-                
-                <div class="stats-row"><span class="stats-label">Start Date</span><span>August 1, 2024</span></div>
-                <div class="stats-row"><span class="stats-label">End Date</span><span>August 31, 2024</span></div>
-                <div class="stats-row"><span class="stats-label">Days Left</span><span>0</span></div>
-                <div class="stats-row"><span class="stats-label">Daily Habits</span><span id="habitCountDisplay">0</span></div>
-                <div class="stats-row"><span class="stats-label">Goals</span><span id="totalGoalsDisplay">0</span></div>
-
-                <div class="big-stat-box completed-box">
-                    <div style="font-size: 11px; margin-bottom: 5px;">COMPLETED</div>
-                    <div class="value" id="globalCompleted">0</div>
-                </div>
-                
-                <div class="big-stat-box remaining-box">
-                    <div style="font-size: 11px; margin-bottom: 5px;">REMAINING</div>
-                    <div class="value" id="globalRemaining">0</div>
+        <!-- Email Generator -->
+        <div class="bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-2xl fade-in email-glow">
+            <div class="text-center mb-8">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-gray-200 bg-clip-text text-transparent">
+                    Your Disposable Email
+                </h2>
+                <p class="text-xl opacity-90">Protect your real inbox from spam</p>
+            </div>
+            
+            <div class="relative mb-8">
+                <input id="email-display" type="text" readonly 
+                       class="w-full text-center text-2xl md:text-3xl font-mono font-bold py-8 px-6 bg-white/20 backdrop-blur-xl rounded-2xl border-4 border-white/30 text-white focus:outline-none email-glow hover:border-white/50 transition-all duration-300"
+                       value="Click 'New' to generate your email">
+                <div id="loading-spinner" class="absolute right-4 top-1/2 -translate-y-1/2 hidden">
+                    <i class="fa-solid fa-spinner fa-spin text-xl"></i>
                 </div>
             </div>
-
-            <div class="panel">
-                <div class="circles-container">
-                    <div class="circle-wrap"><div class="circle" id="circle1" style="border-top-color: var(--cyan);">0%</div><span style="font-size: 10px; color: var(--text-muted);">MOMENTUM</span></div>
-                    <div class="circle-wrap"><div class="circle" id="circle2" style="border-top-color: var(--green);">0%</div><span style="font-size: 10px; color: var(--text-muted);">DAILY PROGRESS</span></div>
-                    <div class="circle-wrap"><div class="circle" id="circle3" style="border-top-color: var(--purple);">0%</div><span style="font-size: 10px; color: var(--text-muted);">WEEKLY PROGRESS</span></div>
-                    <div class="circle-wrap"><div class="circle" id="circle4" style="border-top-color: var(--yellow);">0%</div><span style="font-size: 10px; color: var(--text-muted);">MONTHLY PROGRESS</span></div>
-                </div>
-                <div style="text-align: center; font-size: 10px; color: var(--text-muted); margin-bottom: 10px;">DAILY PROGRESS</div>
-                <div class="chart-wrap">
-                    <canvas id="mainChart"></canvas>
-                </div>
+            
+            <div class="flex flex-wrap gap-4 justify-center items-center mb-8">
+                <button onclick="copyEmail()" class="px-8 py-4 bg-white/20 backdrop-blur-sm rounded-2xl font-semibold hover:bg-white/30 transition-all flex items-center gap-3 group">
+                    <i class="fa-regular fa-copy group-hover:fa-solid"></i>
+                    <span>Copy Email</span>
+                </button>
+                <button onclick="generateNewEmail()" class="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 rounded-2xl font-bold shadow-2xl hover:shadow-3xl transition-all flex items-center gap-3 pulse-glow">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                    <span>New Email</span>
+                </button>
             </div>
-
-            <div class="panel">
-                <div class="mini-section-title">TOP HABITS</div>
-                <div id="topHabitsList" style="margin-bottom: 20px;"></div>
-                
-                <div class="mini-section-title">ACTIVE STREAKS</div>
-                <div id="activeStreaksList"></div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center text-sm opacity-80">
+                <div><i class="fa-solid fa-clock text-green-400 mb-1"></i><div>5 Min Active</div></div>
+                <div><i class="fa-solid fa-lock text-blue-400 mb-1"></i><div>100% Private</div></div>
+                <div><i class="fa-solid fa-inbox text-purple-400 mb-1"></i><div>Live Inbox</div></div>
+                <div><i class="fa-solid fa-bolt text-yellow-400 mb-1"></i><div>Lightning Fast</div></div>
             </div>
         </div>
 
-        <div class="grid-panel">
-            <table>
-                <thead>
-                    <tr class="week-header">
-                        <th class="habit-col" style="background: var(--bg-color); color: var(--text-main); font-size: 12px;">DAILY HABITS</th>
-                        <th colspan="7" class="wk1" style="color: var(--cyan);">Week 1</th>
-                        <th colspan="7" class="wk2" style="color: var(--green);">Week 2</th>
-                        <th colspan="7" class="wk3" style="color: var(--purple);">Week 3</th>
-                        <th colspan="7" class="wk4" style="color: var(--yellow);">Week 4</th>
-                        <th colspan="3" class="wk5" style="color: var(--pink);">Extra Days</th>
-                        <th colspan="2" style="background: var(--panel-bg); color: var(--text-muted);">PROGRESS</th>
-                        <th rowspan="2" style="background: var(--panel-bg); width: 30px; writing-mode: vertical-rl; transform: rotate(180deg); color: var(--text-muted); padding: 5px;">STREAK</th>
-                    </tr>
-                    <tr class="day-header" id="dayNumbersRow">
-                        <th class="habit-col" style="font-size: 9px; text-align: right; padding-right: 10px;">GOALS</th>
-                        <th style="width: 40px;">%</th>
-                        <th style="width: 80px;">Bar</th>
-                    </tr>
-                </thead>
-                <tbody id="gridBody">
-                    </tbody>
-                <tfoot>
-                    <tr class="add-row">
-                        <td class="habit-col" style="border-right: none;"><input type="text" id="newHabitName" class="add-input" placeholder="Type new habit..."></td>
-                        <td colspan="34" style="text-align: left; border-left: none;"><button onclick="addNewHabit()" class="add-btn">Add Habit</button></td>
-                    </tr>
-                </tfoot>
-            </table>
+        <!-- Live Inbox -->
+        <div class="mt-12 bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-2xl fade-in">
+            <div class="flex items-center justify-between mb-8">
+                <h3 class="text-2xl font-bold flex items-center gap-3">
+                    <i class="fa-solid fa-inbox text-2xl"></i>
+                    Live Inbox
+                </h3>
+                <div class="flex items-center gap-4">
+                    <button onclick="refreshInbox()" class="px-4 py-2 bg-white/20 rounded-xl hover:bg-white/30 transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        Refresh
+                    </button>
+                    <div class="flex items-center gap-1 text-sm opacity-80">
+                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        Live
+                    </div>
+                </div>
+            </div>
+            
+            <div id="inbox-container" class="space-y-3 max-h-96 overflow-y-auto">
+                <div class="text-center py-12 opacity-50">
+                    <i class="fa-solid fa-inbox text-4xl mb-4"></i>
+                    <p class="text-lg font-semibold">No emails yet</p>
+                    <p class="text-sm">Send emails to your temporary address</p>
+                </div>
+            </div>
         </div>
 
+        <!-- Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12">
+            <div class="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 text-center">
+                <div class="text-3xl font-bold text-blue-300 mb-2" id="stat-emails">0</div>
+                <div class="text-sm opacity-80">Emails Today</div>
+            </div>
+            <div class="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 text-center">
+                <div class="text-3xl font-bold text-green-300 mb-2" id="stat-active">1</div>
+                <div class="text-sm opacity-80">Active Inbox</div>
+            </div>
+            <div class="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 text-center">
+                <div class="text-3xl font-bold text-purple-300 mb-2" id="stat-uptime">99.9%</div>
+                <div class="text-sm opacity-80">Uptime</div>
+            </div>
+            <div class="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 text-center">
+                <div class="text-3xl font-bold text-yellow-300 mb-2" id="stat-speed">14ms</div>
+                <div class="text-sm opacity-80">Response</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Modal -->
+    <div id="email-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden z-50 flex items-center justify-center p-6">
+        <div class="bg-white/90 dark:bg-gray-900/90 backdrop-blur-2xl rounded-3xl max-w-4xl w-full max-h-[90vh] shadow-2xl border border-white/30 overflow-hidden">
+            <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                <h3 id="modal-title" class="text-2xl font-bold">Loading Email...</h3>
+                <button onclick="closeEmailModal()" class="p-2 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            <iframe id="email-frame" class="w-full h-96 md:h-[70vh] border-0 bg-white dark:bg-gray-900"></iframe>
+        </div>
     </div>
 
     <script>
-        const DAYS_IN_MONTH = 31;
-        let habits = JSON.parse(localStorage.getItem('ultimateAugust')) || [
-            { name: "Plan my day", ticks: Array(31).fill(false) },
-            { name: "Stretch for 10 mins", ticks: Array(31).fill(false) },
-            { name: "Study for 30 mins", ticks: Array(31).fill(false) }
-        ];
-        
-        let chartObj = null;
+        // === CORE VARIABLES ===
+        const API_BASE = 'https://api.mail.gw';
+        let currentToken = '';
+        let currentEmail = '';
+        let messages = [];
+        let autoRefreshInterval;
 
-        function getWeekColorClass(dayIndex) {
-            let day = dayIndex + 1;
-            if(day <= 7) return ['wk1', '#00d2ff'];
-            if(day <= 14) return ['wk2', '#00e676'];
-            if(day <= 21) return ['wk3', '#8e24aa'];
-            if(day <= 28) return ['wk4', '#ffea00'];
-            return ['wk5', '#ff4081'];
-        }
-
-        function init() {
-            // Build day headers
-            const dayRow = document.getElementById('dayNumbersRow');
-            for(let i = 0; i < DAYS_IN_MONTH; i++) {
-                const th = document.createElement('th');
-                th.innerText = i + 1;
-                th.className = getWeekColorClass(i)[0];
-                dayRow.insertBefore(th, dayRow.children[i+1]);
-            }
-            renderAll();
-        }
-
-        function renderAll() {
-            renderGrid();
-            updateStatsAndCharts();
-        }
-
-        function renderGrid() {
-            const tbody = document.getElementById('gridBody');
-            tbody.innerHTML = '';
+        // === MAIN FUNCTIONS ===
+        async function generateNewEmail() {
+            const emailDisplay = document.getElementById('email-display');
+            const spinner = document.getElementById('loading-spinner');
             
-            habits.forEach((habit, hIndex) => {
-                const tr = document.createElement('tr');
-                let html = `<td class="habit-col">
-                    <button onclick="deleteHabit(${hIndex})" style="background:none; border:none; color:var(--red); cursor:pointer; margin-right:5px;">×</button> 
-                    ${habit.name}
-                </td>`;
+            spinner.classList.remove('hidden');
+            emailDisplay.value = 'Generating secure email...';
+            
+            try {
+                // Get available domain
+                const domainRes = await fetch(`${API_BASE}/domains`);
+                const domains = await domainRes.json();
+                const domain = domains['hydra:member'][0]?.domain || 'guerrillamail.com';
                 
-                let completedDays = 0;
-                let currentStreak = 0;
-                let maxStreak = 0;
-
-                for(let d = 0; d < DAYS_IN_MONTH; d++) {
-                    let [bgClass, hexColor] = getWeekColorClass(d);
-                    const isChecked = habit.ticks[d] ? 'checked' : '';
-                    if(habit.ticks[d]) {
-                        completedDays++;
-                        currentStreak++;
-                        if(currentStreak > maxStreak) maxStreak = currentStreak;
-                    } else {
-                        currentStreak = 0; // reset streak
-                    }
-                    html += `<td class="${bgClass}"><input type="checkbox" style="color: ${hexColor};" ${isChecked} onchange="toggleTick(${hIndex}, ${d})"></td>`;
-                }
-
-                let progressPct = Math.round((completedDays / DAYS_IN_MONTH) * 100);
-                let barColor = progressPct > 70 ? 'var(--cyan)' : progressPct > 40 ? 'var(--yellow)' : 'var(--pink)';
-
-                html += `
-                    <td class="prog-text" style="color: ${barColor}">${progressPct}%</td>
-                    <td>
-                        <div class="mini-bar-bg" style="height: 6px; width: 60px; margin: 0 auto;">
-                            <div class="mini-bar-fill" style="width: ${progressPct}%; background: ${barColor};"></div>
-                        </div>
-                    </td>
-                    <td class="streak-col">${maxStreak}</td>
-                `;
-                tr.innerHTML = html;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function updateStatsAndCharts() {
-            let totalGoals = habits.length * DAYS_IN_MONTH;
-            let totalCompleted = 0;
-            let dailyCompletion = Array(DAYS_IN_MONTH).fill(0);
-
-            // Calculate metrics
-            habits.forEach(habit => {
-                habit.ticks.forEach((ticked, d) => {
-                    if(ticked) {
-                        totalCompleted++;
-                        dailyCompletion[d]++;
-                    }
+                // Generate random username
+                const username = 'temp' + Math.floor(10000 + Math.random() * 90000);
+                const fullEmail = `${username}@${domain}`;
+                const tempPassword = 'TempPass' + Math.random().toString(36).slice(-8);
+                
+                // Create account
+                const accountRes = await fetch(`${API_BASE}/accounts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ address: fullEmail, password: tempPassword })
                 });
-            });
-
-            // Update Left Panel
-            document.getElementById('habitCountDisplay').innerText = habits.length;
-            document.getElementById('totalGoalsDisplay').innerText = totalGoals;
-            document.getElementById('globalCompleted').innerText = totalCompleted;
-            document.getElementById('globalRemaining').innerText = totalGoals > 0 ? totalGoals - totalCompleted : 0;
-
-            // Update Circles
-            let overallPct = totalGoals > 0 ? Math.round((totalCompleted / totalGoals) * 100) : 0;
-            document.getElementById('circle1').innerText = overallPct + '%';
-            document.getElementById('circle2').innerText = overallPct + '%';
-            document.getElementById('circle4').innerText = overallPct + '%';
-
-            // Right Panel (Top Habits Mockup)
-            const topHabitsDiv = document.getElementById('topHabitsList');
-            topHabitsDiv.innerHTML = '';
-            habits.slice(0, 5).forEach((h, i) => {
-                let p = Math.round((h.ticks.filter(Boolean).length / DAYS_IN_MONTH) * 100);
-                let c = ['var(--cyan)', 'var(--green)', 'var(--purple)', 'var(--yellow)', 'var(--pink)'][i%5];
-                topHabitsDiv.innerHTML += `
-                    <div class="mini-bar-row">
-                        <div class="mini-bar-name">${h.name}</div>
-                        <div class="mini-bar-bg"><div class="mini-bar-fill" style="width:${p}%; background:${c};"></div></div>
-                        <div style="width: 20px; text-align:right;">${h.ticks.filter(Boolean).length}</div>
-                    </div>`;
-            });
-
-            // Render Chart
-            renderMainChart(dailyCompletion);
-        }
-
-        function renderMainChart(dataArray) {
-            const ctx = document.getElementById('mainChart').getContext('2d');
-            if(chartObj) chartObj.destroy();
-            
-            chartObj = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: Array.from({length: 31}, (_, i) => i + 1),
-                    datasets: [{
-                        data: dataArray,
-                        borderColor: '#00e676',
-                        backgroundColor: 'rgba(0, 230, 118, 0.2)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: { display: false, max: habits.length > 0 ? habits.length : 1 },
-                        x: { display: false }
-                    },
-                    plugins: { legend: { display: false }, tooltip: { enabled: false } },
-                    layout: { padding: 0 }
+                
+                if (accountRes.ok) {
+                    // Get token
+                    const tokenRes = await fetch(`${API_BASE}/token`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ address: fullEmail, password: tempPassword })
+                    });
+                    
+                    const tokenData = await tokenRes.json();
+                    currentToken = tokenData.token;
+                    currentEmail = fullEmail;
+                    
+                    // Update UI
+                    emailDisplay.value = fullEmail;
+                    spinner.classList.add('hidden');
+                    
+                    // Clear inbox & start monitoring
+                    messages = [];
+                    updateInbox();
+                    startAutoRefresh();
+                    
+                    console.log('✅ New email generated:', fullEmail);
                 }
-            });
-        }
-
-        function toggleTick(hIndex, dIndex) {
-            habits[hIndex].ticks[dIndex] = !habits[hIndex].ticks[dIndex];
-            saveData();
-        }
-
-        function addNewHabit() {
-            const input = document.getElementById('newHabitName');
-            if(input.value.trim() !== '') {
-                habits.push({ name: input.value.trim(), ticks: Array(31).fill(false) });
-                input.value = '';
-                saveData();
+            } catch (error) {
+                emailDisplay.value = 'Error! Click New again';
+                spinner.classList.add('hidden');
+                console.error('Generate error:', error);
             }
         }
 
-        function deleteHabit(index) {
-            habits.splice(index, 1);
-            saveData();
+        async function refreshInbox() {
+            if (!currentToken) return;
+            
+            try {
+                const res = await fetch(`${API_BASE}/messages`, {
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
+                const data = await res.json();
+                messages = data['hydra:member'] || [];
+                updateInbox();
+            } catch (error) {
+                console.error('Refresh error:', error);
+            }
         }
 
-        function saveData() {
-            localStorage.setItem('ultimateAugust', JSON.stringify(habits));
-            renderAll();
+        function updateInbox() {
+            const container = document.getElementById('inbox-container');
+            const emailCount = document.getElementById('stat-emails');
+            
+            if (messages.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-16 opacity-50">
+                        <i class="fa-solid fa-inbox text-5xl mb-6"></i>
+                        <p class="text-xl font-semibold mb-2">No emails yet</p>
+                        <p class="text-lg">Send test emails to your temporary address</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = messages.map(msg => `
+                    <div class="bg-white/20 backdrop-blur-sm rounded-2xl p-6 border border-white/30 hover:border-white/50 transition-all cursor-pointer group" onclick="openEmail('${msg.id}')">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="flex-1 min-w-0">
+                                <div class="font-bold text-lg truncate mb-1 group-hover:text-blue-300 transition">${msg.subject || '(No Subject)'}</div>
+                                <div class="text-sm opacity-80 truncate">${msg.from?.address || 'Unknown Sender'}</div>
+                            </div>
+                            <div class="text-right ml-4 flex-shrink-0">
+                                <div class="text-xs opacity-70">${new Date(msg.createdAt).toLocaleString()}</div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            if (emailCount) emailCount.textContent = messages.length;
         }
 
-        // Run
-        init();
+        function openEmail(messageId) {
+            const modal = document.getElementById('email-modal');
+            const title = document.getElementById('modal-title');
+            const frame = document.getElementById('email-frame');
+            
+            const message = messages.find(m => m.id === messageId);
+            if (message) {
+                title.textContent = message.subject || 'No Subject';
+                frame.src = `${API_BASE}/messages/${messageId}/raw?Authorization=Bearer ${currentToken}`;
+                modal.classList.remove('hidden');
+            }
+        }
+
+        function closeEmailModal() {
+            document.getElementById('email-modal').classList.add('hidden');
+            document.getElementById('email-frame').src = '';
+        }
+
+        function copyEmail() {
+            const email = document.getElementById('email-display').value;
+            navigator.clipboard.writeText(email).then(() => {
+                // Visual feedback
+                const input = document.getElementById('email-display');
+                const original = input.style.background;
+                input.style.background = '#10b981';
+                setTimeout(() => input.style.background = original, 1000);
+            });
+        }
+
+        function startAutoRefresh() {
+            clearInterval(autoRefreshInterval);
+            autoRefreshInterval = setInterval(refreshInbox, 5000);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark');
+            const icon = document.getElementById('theme-icon');
+            icon.classList.toggle('fa-moon');
+            icon.classList.toggle('fa-sun');
+        }
+
+        // === INIT ===
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-generate first email
+            setTimeout(generateNewEmail, 1000);
+            
+            // Close modal on outside click
+            document.getElementById('email-modal').addEventListener('click', function(e) {
+                if (e.target === this) closeEmailModal();
+            });
+            
+            console.log('🚀 TempMail Pro Ready!');
+        });
     </script>
 </body>
 </html>
