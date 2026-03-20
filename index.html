@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌍 Global SMS Chat - All Countries</title>
+    <title>🌍 Global SMS Chat - Perfect</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -12,7 +12,7 @@
             overflow: hidden;
         }
 
-        /* MODAL */
+        /* MODAL - FIXED */
         .modal {
             position: fixed; inset: 0; background: rgba(0,0,0,0.9);
             display: flex; align-items: center; justify-content: center; z-index: 1000;
@@ -21,52 +21,52 @@
         .modal.hide { opacity: 0; pointer-events: none; }
         .modal-content {
             background: white; border-radius: 24px; padding: 40px 32px;
-            text-align: center; max-width: 420px; width: 90%;
-            transform: scale(1); transition: all 0.3s ease;
+            text-align: center; max-width: 420px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.3);
         }
         .modal h1 { font-size: 28px; margin-bottom: 8px; color: #1a1a1a; }
         .modal p { color: #666; margin-bottom: 24px; }
         
-        /* PHONE INPUT */
-        .phone-input-group {
-            position: relative; margin-bottom: 20px;
-        }
-        #countryCode {
+        /* PHONE INPUT - FIXED */
+        .phone-input-group { position: relative; margin-bottom: 20px; }
+        #countrySelect {
             position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
-            background: none; border: none; font-size: 18px; font-weight: 600;
-            color: #374151; pointer-events: none; z-index: 2;
+            background: none; border: none; font-size: 18px; font-weight: 600; color: #374151;
+            cursor: pointer; z-index: 2; padding: 0;
         }
         #phoneInput {
-            width: 100%; padding: 16px 20px 16px 60px; border: 2px solid #e1e5e9;
+            width: 100%; padding: 16px 20px 16px 70px !important; border: 2px solid #e1e5e9;
             border-radius: 50px; font-size: 18px; outline: none; font-family: inherit;
         }
         #phoneInput:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.2); }
         #startBtn {
             width: 100%; padding: 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white; border: none; border-radius: 50px; font-size: 18px;
-            cursor: pointer; transition: all 0.3s; font-family: inherit;
+            color: white; border: none; border-radius: 50px; font-size: 18px; cursor: pointer;
+            transition: all 0.3s; font-family: inherit; font-weight: 600;
         }
-        #startBtn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(102,126,234,0.3); }
+        #startBtn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(102,126,234,0.4); }
         #startBtn:disabled { opacity: 0.6; cursor: not-allowed; }
-        .error { color: #ef4444; font-size: 14px; margin-top: 10px; display: none; }
+        .error { color: #ef4444; font-size: 14px; margin-top: 12px; display: none; }
+
+        /* COUNTRY DROPDOWN - FIXED */
         .country-list { 
-            position: absolute; top: 100%; left: 0; right: 0; 
+            position: absolute; top: calc(100% + 8px); left: 0; right: 0; 
             background: white; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-            max-height: 200px; overflow-y: auto; display: none; z-index: 10;
+            max-height: 240px; overflow-y: auto; display: none; z-index: 10;
             border: 1px solid #e5e7eb;
         }
         .country-item { 
-            padding: 12px 20px; cursor: pointer; border-bottom: 1px solid #f3f4f6;
-            display: flex; align-items: center; gap: 12px; font-size: 16px;
+            padding: 14px 20px; cursor: pointer; border-bottom: 1px solid #f3f4f6;
+            display: flex; align-items: center; gap: 12px; font-size: 16px; transition: background 0.2s;
         }
         .country-item:hover { background: #f8fafc; }
-        .country-flag { font-size: 20px; }
+        .country-item:last-child { border-bottom: none; }
+        .country-flag { font-size: 22px; }
 
-        /* CHAT */
+        /* CHAT SCREEN - FIXED */
         .chat-screen {
             height: 100vh; display: flex; flex-direction: column;
             background: #f8f9fa; transform: translateX(100%);
-            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: transform 0.4s ease;
         }
         .chat-screen.show { transform: translateX(0); }
         .chat-header {
@@ -74,9 +74,9 @@
             display: flex; align-items: center; gap: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
         .back-btn {
-            width: 44px; height: 44px; border-radius: 50%; background: none;
-            border: none; font-size: 20px; cursor: pointer; color: #6b7280;
-            display: flex; align-items: center; justify-content: center;
+            width: 44px; height: 44px; border-radius: 50%; background: none; border: none;
+            font-size: 20px; cursor: pointer; color: #6b7280; display: flex; align-items: center;
+            justify-content: center; transition: background 0.2s;
         }
         .back-btn:hover { background: #f3f4f6; }
         .contact-info { flex: 1; }
@@ -85,25 +85,25 @@
 
         .messages {
             flex: 1; padding: 24px 20px; overflow-y: auto; background: #f8f9fa;
-            scroll-behavior: smooth;
         }
         .message {
-            margin-bottom: 16px; max-width: 75%; padding: 12px 16px;
-            border-radius: 20px; animation: slideIn 0.3s ease-out;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1); word-wrap: break-word;
+            margin-bottom: 16px; max-width: 75%; padding: 12px 16px; border-radius: 20px;
+            animation: slideIn 0.3s ease-out; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            word-wrap: break-word; line-height: 1.4;
         }
         .message.sent {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white; margin-left: auto; border-bottom-right-radius: 6px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;
+            margin-left: auto; border-bottom-right-radius: 6px;
         }
         .message.received {
-            background: white; color: #374151; border-bottom-left-radius: 6px;
-            margin-right: auto; border: 1px solid #e5e7eb;
+            background: white; color: #374151; border-bottom-left-radius: 6px; margin-right: auto;
+            border: 1px solid #e5e7eb;
         }
-        .message-time { font-size: 12px; opacity: 0.8; margin-top: 4px; }
+        .message-time { font-size: 12px; opacity: 0.8; margin-top: 4px; font-weight: 400; }
         .typing {
-            display: flex; gap: 4px; padding: 12px 16px; margin-bottom: 16px;
-            max-width: 75%; margin-right: auto;
+            display: flex; gap: 4px; padding: 12px 16px; margin-bottom: 16px; max-width: 75%;
+            margin-right: auto; background: white; border-radius: 20px; border: 1px solid #e5e7eb;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-bottom-left-radius: 6px;
         }
         .typing-dot {
             width: 8px; height: 8px; background: #9ca3af; border-radius: 50%;
@@ -113,36 +113,29 @@
         .typing-dot:nth-child(3) { animation-delay: 0.4s; }
 
         .input-area {
-            padding: 20px; background: white; border-top: 1px solid #e5e7eb;
-            display: flex; gap: 12px;
+            padding: 20px; background: white; border-top: 1px solid #e5e7eb; display: flex; gap: 12px;
         }
         #messageInput {
-            flex: 1; padding: 16px 20px; border: 1px solid #d1d5db;
-            border-radius: 25px; font-size: 16px; outline: none; resize: vertical;
-            font-family: inherit; line-height: 1.4; max-height: 120px;
+            flex: 1; padding: 16px 20px; border: 1px solid #d1d5db; border-radius: 25px;
+            font-size: 16px; outline: none; resize: vertical; font-family: inherit;
+            line-height: 1.4; max-height: 120px; min-height: 52px;
         }
         #messageInput:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
         #sendBtn {
-            width: 56px; height: 56px; border: none; border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white; font-size: 18px; cursor: pointer; transition: all 0.3s;
-            flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+            width: 56px; height: 56px; border: none; border-radius: 50%; flex-shrink: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;
+            font-size: 18px; cursor: pointer; transition: all 0.3s; display: flex;
+            align-items: center; justify-content: center;
         }
         #sendBtn:hover:not(:disabled) { transform: scale(1.05); }
         #sendBtn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(20px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-        @keyframes typing {
-            0%, 60%, 100% { transform: translateY(0); }
-            30% { transform: translateY(-10px); }
-        }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes typing { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-10px); } }
 
         @media (max-width: 480px) {
             .modal-content { margin: 20px; padding: 32px 24px; }
-            .chat-header { padding: 16px; }
+            .chat-header, .input-area { padding: 16px; }
             .messages { padding: 16px 12px; }
         }
 
@@ -152,199 +145,14 @@
     </style>
 </head>
 <body>
-    <!-- GLOBAL PHONE INPUT -->
+    <!-- START MODAL -->
     <div id="startModal" class="modal">
         <div class="modal-content">
-            <h1>🌍 Global SMS</h1>
-            <p>Send SMS to ANY country phone number</p>
+            <h1>🌍 Global SMS Chat</h1>
+            <p>Select country & enter phone number</p>
             <div class="phone-input-group">
-                <button id="countrySelect" style="background:none;border:none;font-size:18px;font-weight:600;color:#374151;padding:16px 20px 16px 16px;cursor:pointer;">
-                    🇺🇸 +1
-                </button>
-                <input type="tel" id="phoneInput" placeholder="555 123 4567" maxlength="15">
+                <button id="countrySelect">🇺🇸 +1</button>
+                <input type="tel" id="phoneInput" placeholder="Phone number">
                 <div id="countryList" class="country-list"></div>
             </div>
-            <button id="startBtn" disabled>🚀 Start Chat</button>
-            <div id="errorMsg" class="error">Enter valid phone number</div>
-        </div>
-    </div>
-
-    <!-- CHAT -->
-    <div id="chatScreen" class="chat-screen">
-        <div class="chat-header">
-            <button id="backBtn" class="back-btn" aria-label="Back">←</button>
-            <div class="contact-info">
-                <div id="contactName" class="contact-name">Global User</div>
-                <div id="contactNumber" class="contact-number"></div>
-            </div>
-        </div>
-        <div id="messages" class="messages"></div>
-        <div class="input-area">
-            <textarea id="messageInput" placeholder="💬 Type message..." rows="1"></textarea>
-            <button id="sendBtn" disabled>📤</button>
-        </div>
-    </div>
-
-    <script>
-        class GlobalSMSChat {
-            constructor() {
-                this.currentPhone = '';
-                this.currentCountryCode = '+1';
-                this.conversations = this.loadData();
-                this.init();
-            }
-
-            init() {
-                this.startModal = document.getElementById('startModal');
-                this.chatScreen = document.getElementById('chatScreen');
-                this.countrySelect = document.getElementById('countrySelect');
-                this.phoneInput = document.getElementById('phoneInput');
-                this.countryList = document.getElementById('countryList');
-                this.startBtn = document.getElementById('startBtn');
-                this.errorMsg = document.getElementById('errorMsg');
-                this.backBtn = document.getElementById('backBtn');
-                this.contactNameEl = document.getElementById('contactName');
-                this.contactNumberEl = document.getElementById('contactNumber');
-                this.messagesEl = document.getElementById('messages');
-                this.messageInput = document.getElementById('messageInput');
-                this.sendBtn = document.getElementById('sendBtn');
-
-                this.countries = [
-                    { code: '+1', name: 'USA', flag: '🇺🇸' },
-                    { code: '+91', name: 'India', flag: '🇮🇳' },
-                    { code: '+44', name: 'UK', flag: '🇬🇧' },
-                    { code: '+49', name: 'Germany', flag: '🇩🇪' },
-                    { code: '+33', name: 'France', flag: '🇫🇷' },
-                    { code: '+81', name: 'Japan', flag: '🇯🇵' },
-                    { code: '+86', name: 'China', flag: '🇨🇳' },
-                    { code: '+234', name: 'Nigeria', flag: '🇳🇬' },
-                    { code: '+92', name: 'Pakistan', flag: '🇵🇰' },
-                    { code: '+880', name: 'Bangladesh', flag: '🇧🇩' },
-                    { code: '+971', name: 'UAE', flag: '🇦🇪' },
-                    { code: '+966', name: 'Saudi Arabia', flag: '🇸🇦' },
-                    { code: '+82', name: 'South Korea', flag: '🇰🇷' },
-                    { code: '+55', name: 'Brazil', flag: '🇧🇷' },
-                    { code: '+52', name: 'Mexico', flag: '🇲🇽' },
-                    { code: '+27', name: 'South Africa', flag: '🇿🇦' },
-                    { code: '+61', name: 'Australia', flag: '🇦🇺' },
-                    { code: '+7', name: 'Russia', flag: '🇷🇺' },
-                    { code: '+20', name: 'Egypt', flag: '🇪🇬' },
-                    { code: '+254', name: 'Kenya', flag: '🇰🇪' },
-                    { code: '+63', name: 'Philippines', flag: '🇵🇭' },
-                    { code: '+84', name: 'Vietnam', flag: '🇻🇳' },
-                    { code: '+62', name: 'Indonesia', flag: '🇮🇩' },
-                    { code: '+212', name: 'Morocco', flag: '🇲🇦' }
-                ];
-
-                this.bindEvents();
-                this.renderCountryList();
-                this.phoneInput.focus();
-            }
-
-            bindEvents() {
-                this.countrySelect.addEventListener('click', () => {
-                    this.countryList.style.display = this.countryList.style.display === 'block' ? 'none' : 'block';
-                });
-
-                this.startBtn.addEventListener('click', () => this.startChat());
-                this.sendBtn.addEventListener('click', () => this.sendMessage());
-                this.backBtn.addEventListener('click', () => this.goBack());
-                this.messageInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        this.sendMessage();
-                    }
-                });
-                this.messageInput.addEventListener('input', () => this.autoResize());
-                this.phoneInput.addEventListener('input', () => this.validatePhone());
-
-                // Close country list on outside click
-                document.addEventListener('click', (e) => {
-                    if (!this.countrySelect.contains(e.target) && !this.countryList.contains(e.target)) {
-                        this.countryList.style.display = 'none';
-                    }
-                });
-            }
-
-            renderCountryList() {
-                this.countryList.innerHTML = '';
-                this.countries.forEach(country => {
-                    const div = document.createElement('div');
-                    div.className = 'country-item';
-                    div.innerHTML = `<span class="country-flag">${country.flag}</span>${country.flag} ${country.code} ${country.name}`;
-                    div.onclick = () => this.selectCountry(country);
-                    this.countryList.appendChild(div);
-                });
-            }
-
-            selectCountry(country) {
-                this.currentCountryCode = country.code;
-                this.countrySelect.textContent = `${country.flag} ${country.code}`;
-                this.countryList.style.display = 'none';
-                this.validatePhone();
-            }
-
-            validatePhone() {
-                const phone = this.phoneInput.value.replace(/\D/g, '');
-                const minLength = this.currentCountryCode === '+1' ? 10 : 7;
-                
-                if (phone.length >= minLength) {
-                    this.errorMsg.style.display = 'none';
-                    this.startBtn.disabled = false;
-                } else {
-                    this.startBtn.disabled = true;
-                }
-            }
-
-            startChat() {
-                const phoneNum = this.phoneInput.value.replace(/\D/g, '');
-                this.currentPhone = this.currentCountryCode + phoneNum;
-                this.contactNumberEl.textContent = `${this.countrySelect.textContent} ${this.phoneInput.value}`;
-                this.contactNameEl.textContent = 'Global User';
-
-                const convo = this.conversations[this.currentPhone] || [];
-                this.renderMessages(convo);
-
-                this.startModal.classList.add('hide');
-                this.chatScreen.classList.add('show');
-                this.messageInput.focus();
-                this.sendBtn.disabled = false;
-            }
-
-            sendMessage() {
-                const text = this.messageInput.value.trim();
-                if (!text || !this.currentPhone) return;
-
-                this.addMessage(text, 'sent');
-                this.messageInput.value = '';
-                this.showTyping();
-                this.scheduleReply();
-            }
-
-            addMessage(text, type) {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = `message ${type}`;
-                
-                const now = new Date();
-                messageDiv.innerHTML = `
-                    <div>${this.escapeHtml(text)}</div>
-                    <div class="message-time">${now.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}</div>
-                `;
-
-                this.messagesEl.appendChild(messageDiv);
-                this.messagesEl.scrollTop = this.messagesEl.scrollHeight;
-
-                if (!this.conversations[this.currentPhone]) {
-                    this.conversations[this.currentPhone] = [];
-                }
-                this.conversations[this.currentPhone].push({
-                    text: text, type: type, time: now.toISOString()
-                });
-                this.saveData();
-            }
-
-            renderMessages(messages) {
-                this.messagesEl.innerHTML = '';
-                messages.forEach(msg => {
-                    const time = new Date(msg.time);
-                    this.addMessage(msg.text, msg.type
+            <button id="startBtn" disabled>🚀 Start Messaging
