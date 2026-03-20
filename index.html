@@ -3,345 +3,336 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMS Messenger</title>
+    <title>📱 SMS Chat - Real Time</title>
+    <script src="https://unpkg.com/socket.io-client@4/dist/socket.io.js"></script>
     <style>
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            margin: 0; padding: 0; box-sizing: border-box;
         }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .chat-container {
-            width: 100%;
-            max-width: 400px;
-            height: 80vh;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
+            height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             overflow: hidden;
         }
 
+        /* START MODAL */
+        .modal {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+            display: flex; align-items: center; justify-content: center; z-index: 1000;
+        }
+        .modal-content {
+            background: white; border-radius: 24px; padding: 40px 32px;
+            text-align: center; max-width: 380px; width: 90%; transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        .modal.show .modal-content { transform: scale(1); }
+        .modal h1 { font-size: 28px; margin-bottom: 8px; color: #1a1a1a; }
+        .modal p { color: #666; margin-bottom: 32px; }
+        #phoneInput {
+            width: 100%; padding: 16px 20px; border: 2px solid #e1e5e9;
+            border-radius: 50px; font-size: 18px; margin-bottom: 20px; outline: none;
+        }
+        #phoneInput:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.2); }
+        #startBtn {
+            width: 100%; padding: 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border: none; border-radius: 50px; font-size: 18px; cursor: pointer;
+            transition: all 0.3s;
+        }
+        #startBtn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(102,126,234,0.3); }
+        #startBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .error { color: #ef4444; font-size: 14px; margin-top: 10px; display: none; }
+
+        /* CHAT SCREEN */
+        .chat-screen {
+            height: 100vh; display: flex; flex-direction: column;
+            background: #f8f9fa; transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        .chat-screen.show { transform: translateX(0); }
         .chat-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            text-align: center;
+            background: white; padding: 20px; border-bottom: 1px solid #e5e7eb;
+            display: flex; align-items: center; gap: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
-
-        .chat-header h2 {
-            font-size: 1.2em;
-            margin-bottom: 5px;
+        .back-btn {
+            width: 44px; height: 44px; border-radius: 50%; background: none;
+            border: none; font-size: 20px; cursor: pointer; color: #6b7280;
         }
-
-        .status {
-            font-size: 0.9em;
-            opacity: 0.9;
-        }
+        .back-btn:hover { background: #f3f4f6; }
+        .contact-info { flex: 1; }
+        .contact-name { font-weight: 600; font-size: 18px; color: #111827; }
+        .contact-number { font-size: 14px; color: #6b7280; margin-top: 2px; }
 
         .messages {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            background: #f8f9fa;
+            flex: 1; padding: 24px 20px; overflow-y: auto; background: #f8f9fa;
+            scroll-behavior: smooth;
         }
-
         .message {
-            margin-bottom: 15px;
-            display: flex;
-            animation: slideIn 0.3s ease-out;
+            margin-bottom: 16px; max-width: 75%; padding: 12px 16px;
+            border-radius: 20px; animation: slideIn 0.3s ease-out;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
-
         .message.sent {
-            justify-content: flex-end;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; margin-left: auto; border-bottom-right-radius: 6px;
         }
-
         .message.received {
-            justify-content: flex-start;
+            background: white; color: #374151; border-bottom-left-radius: 6px;
+            margin-right: auto;
         }
-
-        .message-bubble {
-            max-width: 70%;
-            padding: 12px 18px;
-            border-radius: 20px;
-            position: relative;
-            word-wrap: break-word;
-        }
-
-        .message.sent .message-bubble {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-bottom-right-radius: 5px;
-        }
-
-        .message.received .message-bubble {
-            background: white;
-            color: #333;
-            border: 1px solid #e0e0e0;
-            border-bottom-left-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
         .message-time {
-            font-size: 0.7em;
-            opacity: 0.7;
-            margin-top: 5px;
+            font-size: 12px; opacity: 0.8; margin-top: 4px; text-align: right;
         }
-
-        .message.sent .message-time {
-            text-align: right;
+        .typing {
+            display: flex; gap: 4px; padding: 12px 16px; margin-bottom: 16px;
         }
-
-        .input-container {
-            padding: 20px;
-            background: white;
-            border-top: 1px solid #eee;
-        }
-
-        .input-wrapper {
-            display: flex;
-            gap: 10px;
-            align-items: flex-end;
-        }
-
-        #messageInput {
-            flex: 1;
-            padding: 15px 20px;
-            border: 1px solid #e0e0e0;
-            border-radius: 25px;
-            font-size: 16px;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-
-        #messageInput:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        #sendBtn {
-            width: 50px;
-            height: 50px;
-            border: none;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.2em;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #sendBtn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        #sendBtn:active {
-            transform: scale(0.95);
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Custom scrollbar */
-        .messages::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        .messages::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .messages::-webkit-scrollbar-thumb {
-            background: #ccc;
-            border-radius: 2px;
-        }
-
-        .typing-indicator {
-            display: none;
-            padding: 10px 0;
-        }
-
-        .typing-dots {
-            display: flex;
-            gap: 4px;
-        }
-
         .typing-dot {
-            width: 8px;
-            height: 8px;
-            background: #999;
-            border-radius: 50%;
+            width: 8px; height: 8px; background: #9ca3af; border-radius: 50%;
             animation: typing 1.4s infinite;
         }
-
         .typing-dot:nth-child(2) { animation-delay: 0.2s; }
         .typing-dot:nth-child(3) { animation-delay: 0.4s; }
 
+        .input-area {
+            padding: 20px; background: white; border-top: 1px solid #e5e7eb;
+            display: flex; gap: 12px;
+        }
+        #messageInput {
+            flex: 1; padding: 16px 20px; border: 1px solid #d1d5db;
+            border-radius: 25px; font-size: 16px; outline: none; resize: none;
+            max-height: 120px;
+        }
+        #messageInput:focus {
+            border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+        #sendBtn {
+            width: 56px; height: 56px; border: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border-radius: 50%; font-size: 18px; cursor: pointer;
+            transition: all 0.3s;
+        }
+        #sendBtn:hover:not(:disabled) { transform: scale(1.05); }
+        #sendBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        /* ANIMATIONS */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
         @keyframes typing {
             0%, 60%, 100% { transform: translateY(0); }
             30% { transform: translateY(-10px); }
         }
 
+        /* RESPONSIVE */
         @media (max-width: 480px) {
-            .chat-container {
-                height: 100vh;
-                border-radius: 0;
-            }
+            .modal-content { margin: 20px; padding: 32px 24px; }
+            .chat-header { padding: 16px; }
+            .messages { padding: 16px 12px; }
+        }
+
+        /* HIDE SCROLLBAR */
+        .messages::-webkit-scrollbar { width: 4px; }
+        .messages::-webkit-scrollbar-track { background: transparent; }
+        .messages::-webkit-scrollbar-thumb { 
+            background: rgba(107,114,128,0.5); border-radius: 2px; 
         }
     </style>
 </head>
 <body>
-    <div class="chat-container">
+    <!-- START SCREEN -->
+    <div id="startScreen" class="modal show">
+        <div class="modal-content">
+            <h1>📱 SMS Chat</h1>
+            <p>Enter phone number to start messaging</p>
+            <input type="tel" id="phoneInput" placeholder="+1 (555) 123-4567" maxlength="14">
+            <button id="startBtn">Start Chat</button>
+            <div id="errorMsg" class="error">Please enter valid phone number</div>
+        </div>
+    </div>
+
+    <!-- CHAT SCREEN -->
+    <div id="chatScreen" class="chat-screen">
         <div class="chat-header">
-            <h2>John Doe</h2>
-            <div class="status">Online</div>
+            <button id="backBtn" class="back-btn">←</button>
+            <div class="contact-info">
+                <div id="contactName" class="contact-name">Unknown</div>
+                <div id="contactNumber" class="contact-number"></div>
+            </div>
         </div>
         
-        <div class="messages" id="messages">
+        <div id="messages" class="messages">
             <div class="message received">
-                <div class="message-bubble">
-                    Hey! How are you doing today?
-                    <div class="message-time">10:30 AM</div>
-                </div>
+                <div>👋 Welcome to SMS Chat!</div>
+                <div class="message-time">Just now</div>
             </div>
             <div class="message sent">
-                <div class="message-bubble">
-                    I'm doing great! Just finished work. What's up?
-                    <div class="message-time">10:32 AM</div>
-                </div>
-            </div>
-            <div class="message received">
-                <div class="message-bubble">
-                    Not much, just chilling. Want to grab coffee later?
-                    <div class="message-time">10:33 AM</div>
-                </div>
+                <div>Ready to send messages! 📱</div>
+                <div class="message-time">Just now</div>
             </div>
         </div>
-
-        <div class="typing-indicator" id="typingIndicator">
-            <div class="message received">
-                <div class="message-bubble">
-                    <div class="typing-dots">
-                        <div class="typing-dot"></div>
-                        <div class="typing-dot"></div>
-                        <div class="typing-dot"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="input-container">
-            <div class="input-wrapper">
-                <input type="text" id="messageInput" placeholder="Type a message..." maxlength="500">
-                <button id="sendBtn">➤</button>
-            </div>
+        
+        <div class="input-area">
+            <textarea id="messageInput" placeholder="Type your message..."></textarea>
+            <button id="sendBtn">📤</button>
         </div>
     </div>
 
     <script>
-        const messagesContainer = document.getElementById('messages');
-        const messageInput = document.getElementById('messageInput');
-        const sendBtn = document.getElementById('sendBtn');
-        const typingIndicator = document.getElementById('typingIndicator');
-
-        let isTyping = false;
-
-        // Send message function
-        function sendMessage() {
-            const text = messageInput.value.trim();
-            if (text === '') return;
-
-            // Add sent message
-            addMessage(text, 'sent');
-            messageInput.value = '';
-
-            // Simulate typing indicator
-            showTyping();
-
-            // Simulate reply after delay
-            setTimeout(() => {
-                hideTyping();
-                const replies = [
-                    "Sounds good! What time works for you?",
-                    "Sure, I'd love to! Where should we meet?",
-                    "Great! See you at 3 PM ☕",
-                    "Perfect! Looking forward to it!",
-                    "Awesome! Let's do it!"
-                ];
-                const randomReply = replies[Math.floor(Math.random() * replies.length)];
-                addMessage(randomReply, 'received');
-            }, 1500 + Math.random() * 1000);
-        }
-
-        // Add message to chat
-        function addMessage(text, type) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${type}`;
-            
-            const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            
-            messageDiv.innerHTML = `
-                <div class="message-bubble">
-                    ${text}
-                    <div class="message-time">${time}</div>
-                </div>
-            `;
-            
-            messagesContainer.appendChild(messageDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        // Show typing indicator
-        function showTyping() {
-            typingIndicator.style.display = 'block';
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        // Hide typing indicator
-        function hideTyping() {
-            typingIndicator.style.display = 'none';
-        }
-
-        // Event listeners
-        sendBtn.addEventListener('click', sendMessage);
-
-        messageInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                sendMessage();
+        class SMSChat {
+            constructor() {
+                this.currentPhone = '';
+                this.conversations = JSON.parse(localStorage.getItem('smsChats')) || {};
+                this.initElements();
+                this.bindEvents();
+                this.simulateConnection();
             }
-        });
 
-        // Auto-resize input
-        messageInput.addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = this.scrollHeight + 'px';
-        });
+            initElements() {
+                this.startScreen = document.getElementById('startScreen');
+                this.chatScreen = document.getElementById('chatScreen');
+                this.phoneInput = document.getElementById('phoneInput');
+                this.startBtn = document.getElementById('startBtn');
+                this.errorMsg = document.getElementById('errorMsg');
+                this.backBtn = document.getElementById('backBtn');
+                this.contactName = document.getElementById('contactName');
+                this.contactNumber = document.getElementById('contactNumber');
+                this.messages = document.getElementById('messages');
+                this.messageInput = document.getElementById('messageInput');
+                this.sendBtn = document.getElementById('sendBtn');
+            }
 
-        // Focus input on load
+            bindEvents() {
+                this.startBtn.onclick = () => this.startChat();
+                this.sendBtn.onclick = () => this.sendMessage();
+                this.backBtn.onclick = () => this.goBack();
+                this.messageInput.onkeypress = (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        this.sendMessage();
+                    }
+                };
+                this.phoneInput.oninput = () => this.formatPhoneInput();
+            }
+
+            formatPhoneInput() {
+                let val = this.phoneInput.value.replace(/\D/g, '');
+                if (val.length > 11) val = val.slice(0, 11);
+                if (val.length >= 10) {
+                    this.phoneInput.value = '+1 ' + val.slice(0,3) + ' ' + 
+                        val.slice(3,6) + '-' + val.slice(6,10);
+                }
+                this.errorMsg.style.display = 'none';
+            }
+
+            async startChat() {
+                const phone = this.phoneInput.value.replace(/\D/g, '');
+                if (phone.length < 10) {
+                    this.errorMsg.style.display = 'block';
+                    return;
+                }
+
+                this.currentPhone = '+1' + phone;
+                this.contactNumber.textContent = this.phoneInput.value;
+                this.contactName.textContent = 'Mobile User';
+
+                // Load conversation
+                const convo = this.conversations[this.currentPhone] || [];
+                this.renderMessages(convo);
+
+                this.startScreen.classList.remove('show');
+                this.chatScreen.classList.add('show');
+                this.messageInput.focus();
+            }
+
+            sendMessage() {
+                const message = this.messageInput.value.trim();
+                if (!message || !this.currentPhone) return;
+
+                // Add sent message
+                this.addMessage(message, 'sent');
+                this.messageInput.value = '';
+
+                // Simulate API response
+                this.simulateReply();
+            }
+
+            addMessage(text, type, time = new Date()) {
+                const div = document.createElement('div');
+                div.className = `message ${type}`;
+                div.innerHTML = `
+                    <div>${text}</div>
+                    <div class="message-time">${time.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}</div>
+                `;
+                this.messages.appendChild(div);
+                this.messages.scrollTop = this.messages.scrollHeight;
+
+                // Save to localStorage
+                if (!this.conversations[this.currentPhone]) this.conversations[this.currentPhone] = [];
+                this.conversations[this.currentPhone].push({ text, type, time: time.toISOString() });
+                localStorage.setItem('smsChats', JSON.stringify(this.conversations));
+            }
+
+            renderMessages(messages) {
+                this.messages.innerHTML = '';
+                messages.forEach(msg => {
+                    const time = new Date(msg.time);
+                    this.addMessage(msg.text, msg.type, time);
+                });
+            }
+
+            async simulateReply() {
+                // Show typing
+                const typing = document.createElement('div');
+                typing.className = 'typing';
+                typing.innerHTML = `
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                `;
+                this.messages.appendChild(typing);
+                this.messages.scrollTop = this.messages.scrollHeight;
+
+                // Random delay + reply
+                const delay = 1000 + Math.random() * 2000;
+                setTimeout(() => {
+                    this.messages.removeChild(typing);
+                    
+                    const replies = [
+                        "Hey! Thanks for the message! 📱",
+                        "Nice to hear from you! What's up?",
+                        "Got your message! 😊 How are you?",
+                        "Perfect! Everything good?",
+                        "Thanks! Talk soon! 👋",
+                        "Awesome! 👍",
+                        "Received! All good here!",
+                        "Sweet! 😎"
+                    ];
+                    
+                    const reply = replies[Math.floor(Math.random() * replies.length)];
+                    this.addMessage(reply, 'received');
+                }, delay);
+            }
+
+            simulateConnection() {
+                // Fake online status
+                setInterval(() => {
+                    if (Math.random() > 0.7 && this.chatScreen.classList.contains('show')) {
+                        this.addMessage("🤖 I'm online now!", 'received');
+                    }
+                }, 30000);
+            }
+
+            goBack() {
+                this.chatScreen.classList.remove('show');
+                this.startScreen.classList.add('show');
+                this.phoneInput.value = '';
+                this.phoneInput.focus();
+            }
+        }
+
+        // START APP
         window.addEventListener('load', () => {
-            messageInput.focus();
+            new SMSChat();
         });
     </script>
 </body>
