@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📱 SMS Chat - Perfect</title>
+    <title>🌍 Global SMS Chat - All Countries</title>
     <style>
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -23,15 +21,24 @@
         .modal.hide { opacity: 0; pointer-events: none; }
         .modal-content {
             background: white; border-radius: 24px; padding: 40px 32px;
-            text-align: center; max-width: 380px; width: 90%;
+            text-align: center; max-width: 420px; width: 90%;
             transform: scale(1); transition: all 0.3s ease;
         }
         .modal h1 { font-size: 28px; margin-bottom: 8px; color: #1a1a1a; }
-        .modal p { color: #666; margin-bottom: 32px; }
+        .modal p { color: #666; margin-bottom: 24px; }
+        
+        /* PHONE INPUT */
+        .phone-input-group {
+            position: relative; margin-bottom: 20px;
+        }
+        #countryCode {
+            position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; font-size: 18px; font-weight: 600;
+            color: #374151; pointer-events: none; z-index: 2;
+        }
         #phoneInput {
-            width: 100%; padding: 16px 20px; border: 2px solid #e1e5e9;
-            border-radius: 50px; font-size: 18px; margin-bottom: 20px;
-            outline: none; font-family: inherit;
+            width: 100%; padding: 16px 20px 16px 60px; border: 2px solid #e1e5e9;
+            border-radius: 50px; font-size: 18px; outline: none; font-family: inherit;
         }
         #phoneInput:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.2); }
         #startBtn {
@@ -39,13 +46,21 @@
             color: white; border: none; border-radius: 50px; font-size: 18px;
             cursor: pointer; transition: all 0.3s; font-family: inherit;
         }
-        #startBtn:hover:not(:disabled) { 
-            transform: translateY(-2px); box-shadow: 0 10px 20px rgba(102,126,234,0.3); 
-        }
+        #startBtn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(102,126,234,0.3); }
         #startBtn:disabled { opacity: 0.6; cursor: not-allowed; }
-        .error { 
-            color: #ef4444; font-size: 14px; margin-top: 10px; display: none; 
+        .error { color: #ef4444; font-size: 14px; margin-top: 10px; display: none; }
+        .country-list { 
+            position: absolute; top: 100%; left: 0; right: 0; 
+            background: white; border-radius: 12px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            max-height: 200px; overflow-y: auto; display: none; z-index: 10;
+            border: 1px solid #e5e7eb;
         }
+        .country-item { 
+            padding: 12px 20px; cursor: pointer; border-bottom: 1px solid #f3f4f6;
+            display: flex; align-items: center; gap: 12px; font-size: 16px;
+        }
+        .country-item:hover { background: #f8fafc; }
+        .country-flag { font-size: 20px; }
 
         /* CHAT */
         .chat-screen {
@@ -85,9 +100,7 @@
             background: white; color: #374151; border-bottom-left-radius: 6px;
             margin-right: auto; border: 1px solid #e5e7eb;
         }
-        .message-time {
-            font-size: 12px; opacity: 0.8; margin-top: 4px;
-        }
+        .message-time { font-size: 12px; opacity: 0.8; margin-top: 4px; }
         .typing {
             display: flex; gap: 4px; padding: 12px 16px; margin-bottom: 16px;
             max-width: 75%; margin-right: auto;
@@ -108,9 +121,7 @@
             border-radius: 25px; font-size: 16px; outline: none; resize: vertical;
             font-family: inherit; line-height: 1.4; max-height: 120px;
         }
-        #messageInput:focus {
-            border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
-        }
+        #messageInput:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
         #sendBtn {
             width: 56px; height: 56px; border: none; border-radius: 50%;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -120,7 +131,6 @@
         #sendBtn:hover:not(:disabled) { transform: scale(1.05); }
         #sendBtn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-        /* ANIMATIONS */
         @keyframes slideIn {
             from { opacity: 0; transform: translateY(20px) scale(0.95); }
             to { opacity: 1; transform: translateY(0) scale(1); }
@@ -130,68 +140,66 @@
             30% { transform: translateY(-10px); }
         }
 
-        /* RESPONSIVE */
         @media (max-width: 480px) {
             .modal-content { margin: 20px; padding: 32px 24px; }
             .chat-header { padding: 16px; }
             .messages { padding: 16px 12px; }
-            .input-area { padding: 16px; }
         }
 
-        /* SCROLLBAR */
         .messages::-webkit-scrollbar { width: 4px; }
         .messages::-webkit-scrollbar-track { background: transparent; }
-        .messages::-webkit-scrollbar-thumb { 
-            background: rgba(107,114,128,0.5); border-radius: 2px; 
-        }
+        .messages::-webkit-scrollbar-thumb { background: rgba(107,114,128,0.5); border-radius: 2px; }
     </style>
 </head>
 <body>
-    <!-- START MODAL -->
+    <!-- GLOBAL PHONE INPUT -->
     <div id="startModal" class="modal">
         <div class="modal-content">
-            <h1>📱 SMS Chat</h1>
-            <p>Enter phone number to start real-time chat</p>
-            <input type="tel" id="phoneInput" placeholder="+1 (555) 123-4567" maxlength="14">
-            <button id="startBtn">🚀 Start Chat</button>
-            <div id="errorMsg" class="error">Please enter valid 10-digit phone number</div>
+            <h1>🌍 Global SMS</h1>
+            <p>Send SMS to ANY country phone number</p>
+            <div class="phone-input-group">
+                <button id="countrySelect" style="background:none;border:none;font-size:18px;font-weight:600;color:#374151;padding:16px 20px 16px 16px;cursor:pointer;">
+                    🇺🇸 +1
+                </button>
+                <input type="tel" id="phoneInput" placeholder="555 123 4567" maxlength="15">
+                <div id="countryList" class="country-list"></div>
+            </div>
+            <button id="startBtn" disabled>🚀 Start Chat</button>
+            <div id="errorMsg" class="error">Enter valid phone number</div>
         </div>
     </div>
 
-    <!-- CHAT SCREEN -->
+    <!-- CHAT -->
     <div id="chatScreen" class="chat-screen">
         <div class="chat-header">
             <button id="backBtn" class="back-btn" aria-label="Back">←</button>
             <div class="contact-info">
-                <div id="contactName" class="contact-name">Mobile User</div>
-                <div id="contactNumber" class="contact-number">+1 (555) 123-4567</div>
+                <div id="contactName" class="contact-name">Global User</div>
+                <div id="contactNumber" class="contact-number"></div>
             </div>
         </div>
-        
-        <div id="messages" class="messages">
-            <!-- Messages will load here -->
-        </div>
-        
+        <div id="messages" class="messages"></div>
         <div class="input-area">
-            <textarea id="messageInput" placeholder="💬 Type your message..." rows="1"></textarea>
+            <textarea id="messageInput" placeholder="💬 Type message..." rows="1"></textarea>
             <button id="sendBtn" disabled>📤</button>
         </div>
     </div>
 
     <script>
-        class SMSChatApp {
+        class GlobalSMSChat {
             constructor() {
                 this.currentPhone = '';
-                this.conversations = this.loadConversations();
-                this.typingIndicator = null;
+                this.currentCountryCode = '+1';
+                this.conversations = this.loadData();
                 this.init();
             }
 
             init() {
-                // Elements
                 this.startModal = document.getElementById('startModal');
                 this.chatScreen = document.getElementById('chatScreen');
+                this.countrySelect = document.getElementById('countrySelect');
                 this.phoneInput = document.getElementById('phoneInput');
+                this.countryList = document.getElementById('countryList');
                 this.startBtn = document.getElementById('startBtn');
                 this.errorMsg = document.getElementById('errorMsg');
                 this.backBtn = document.getElementById('backBtn');
@@ -201,7 +209,43 @@
                 this.messageInput = document.getElementById('messageInput');
                 this.sendBtn = document.getElementById('sendBtn');
 
-                // Events
+                this.countries = [
+                    { code: '+1', name: 'USA', flag: '🇺🇸' },
+                    { code: '+91', name: 'India', flag: '🇮🇳' },
+                    { code: '+44', name: 'UK', flag: '🇬🇧' },
+                    { code: '+49', name: 'Germany', flag: '🇩🇪' },
+                    { code: '+33', name: 'France', flag: '🇫🇷' },
+                    { code: '+81', name: 'Japan', flag: '🇯🇵' },
+                    { code: '+86', name: 'China', flag: '🇨🇳' },
+                    { code: '+234', name: 'Nigeria', flag: '🇳🇬' },
+                    { code: '+92', name: 'Pakistan', flag: '🇵🇰' },
+                    { code: '+880', name: 'Bangladesh', flag: '🇧🇩' },
+                    { code: '+971', name: 'UAE', flag: '🇦🇪' },
+                    { code: '+966', name: 'Saudi Arabia', flag: '🇸🇦' },
+                    { code: '+82', name: 'South Korea', flag: '🇰🇷' },
+                    { code: '+55', name: 'Brazil', flag: '🇧🇷' },
+                    { code: '+52', name: 'Mexico', flag: '🇲🇽' },
+                    { code: '+27', name: 'South Africa', flag: '🇿🇦' },
+                    { code: '+61', name: 'Australia', flag: '🇦🇺' },
+                    { code: '+7', name: 'Russia', flag: '🇷🇺' },
+                    { code: '+20', name: 'Egypt', flag: '🇪🇬' },
+                    { code: '+254', name: 'Kenya', flag: '🇰🇪' },
+                    { code: '+63', name: 'Philippines', flag: '🇵🇭' },
+                    { code: '+84', name: 'Vietnam', flag: '🇻🇳' },
+                    { code: '+62', name: 'Indonesia', flag: '🇮🇩' },
+                    { code: '+212', name: 'Morocco', flag: '🇲🇦' }
+                ];
+
+                this.bindEvents();
+                this.renderCountryList();
+                this.phoneInput.focus();
+            }
+
+            bindEvents() {
+                this.countrySelect.addEventListener('click', () => {
+                    this.countryList.style.display = this.countryList.style.display === 'block' ? 'none' : 'block';
+                });
+
                 this.startBtn.addEventListener('click', () => this.startChat());
                 this.sendBtn.addEventListener('click', () => this.sendMessage());
                 this.backBtn.addEventListener('click', () => this.goBack());
@@ -212,32 +256,39 @@
                     }
                 });
                 this.messageInput.addEventListener('input', () => this.autoResize());
-                this.phoneInput.addEventListener('input', () => this.formatPhone());
+                this.phoneInput.addEventListener('input', () => this.validatePhone());
 
-                // Focus
-                this.phoneInput.focus();
+                // Close country list on outside click
+                document.addEventListener('click', (e) => {
+                    if (!this.countrySelect.contains(e.target) && !this.countryList.contains(e.target)) {
+                        this.countryList.style.display = 'none';
+                    }
+                });
             }
 
-            loadConversations() {
-                try {
-                    return JSON.parse(localStorage.getItem('smsConversations')) || {};
-                } catch {
-                    return {};
-                }
+            renderCountryList() {
+                this.countryList.innerHTML = '';
+                this.countries.forEach(country => {
+                    const div = document.createElement('div');
+                    div.className = 'country-item';
+                    div.innerHTML = `<span class="country-flag">${country.flag}</span>${country.flag} ${country.code} ${country.name}`;
+                    div.onclick = () => this.selectCountry(country);
+                    this.countryList.appendChild(div);
+                });
             }
 
-            saveConversations() {
-                localStorage.setItem('smsConversations', JSON.stringify(this.conversations));
+            selectCountry(country) {
+                this.currentCountryCode = country.code;
+                this.countrySelect.textContent = `${country.flag} ${country.code}`;
+                this.countryList.style.display = 'none';
+                this.validatePhone();
             }
 
-            formatPhone() {
-                let val = this.phoneInput.value.replace(/\D/g, '');
-                if (val.length > 11) val = val.slice(0, 11);
+            validatePhone() {
+                const phone = this.phoneInput.value.replace(/\D/g, '');
+                const minLength = this.currentCountryCode === '+1' ? 10 : 7;
                 
-                if (val.length >= 10) {
-                    const formatted = '+1 (' + val.slice(0,3) + ') ' + 
-                        val.slice(3,6) + '-' + val.slice(6,10);
-                    this.phoneInput.value = formatted;
+                if (phone.length >= minLength) {
                     this.errorMsg.style.display = 'none';
                     this.startBtn.disabled = false;
                 } else {
@@ -246,35 +297,26 @@
             }
 
             startChat() {
-                const phone = this.phoneInput.value.replace(/\D/g, '');
-                if (phone.length !== 10) {
-                    this.errorMsg.style.display = 'block';
-                    return;
-                }
+                const phoneNum = this.phoneInput.value.replace(/\D/g, '');
+                this.currentPhone = this.currentCountryCode + phoneNum;
+                this.contactNumberEl.textContent = `${this.countrySelect.textContent} ${this.phoneInput.value}`;
+                this.contactNameEl.textContent = 'Global User';
 
-                this.currentPhone = '+1' + phone;
-                this.contactNumberEl.textContent = this.phoneInput.value;
-                this.contactNameEl.textContent = 'Mobile User';
-
-                // Load history
                 const convo = this.conversations[this.currentPhone] || [];
                 this.renderMessages(convo);
 
-                // Show chat
                 this.startModal.classList.add('hide');
                 this.chatScreen.classList.add('show');
                 this.messageInput.focus();
+                this.sendBtn.disabled = false;
             }
 
             sendMessage() {
                 const text = this.messageInput.value.trim();
                 if (!text || !this.currentPhone) return;
 
-                // Add sent message
                 this.addMessage(text, 'sent');
                 this.messageInput.value = '';
-
-                // Show typing + reply
                 this.showTyping();
                 this.scheduleReply();
             }
@@ -292,90 +334,17 @@
                 this.messagesEl.appendChild(messageDiv);
                 this.messagesEl.scrollTop = this.messagesEl.scrollHeight;
 
-                // Save conversation
                 if (!this.conversations[this.currentPhone]) {
                     this.conversations[this.currentPhone] = [];
                 }
                 this.conversations[this.currentPhone].push({
-                    text: text,
-                    type: type,
-                    time: now.toISOString()
+                    text: text, type: type, time: now.toISOString()
                 });
-                this.saveConversations();
+                this.saveData();
             }
 
             renderMessages(messages) {
                 this.messagesEl.innerHTML = '';
                 messages.forEach(msg => {
                     const time = new Date(msg.time);
-                    this.addMessage(msg.text, msg.type, time);
-                });
-            }
-
-            showTyping() {
-                this.typingIndicator = document.createElement('div');
-                this.typingIndicator.className = 'typing';
-                this.typingIndicator.innerHTML = `
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                    <div class="typing-dot"></div>
-                `;
-                this.messagesEl.appendChild(this.typingIndicator);
-                this.messagesEl.scrollTop = this.messagesEl.scrollHeight;
-            }
-
-            hideTyping() {
-                if (this.typingIndicator) {
-                    this.typingIndicator.remove();
-                    this.typingIndicator = null;
-                }
-            }
-
-            scheduleReply() {
-                const delay = 1500 + Math.random() * 2500;
-                setTimeout(() => {
-                    this.hideTyping();
-                    
-                    const replies = [
-                        "Hey! Got your message 😊",
-                        "Thanks for writing! What's up?",
-                        "Perfect! How are you doing?",
-                        "Nice! Everything good? 👍",
-                        "Received! Talk soon 👋",
-                        "Sweet! 😎",
-                        "Hey there! All good?",
-                        "Thanks! Have a great day! 🌟"
-                    ];
-                    
-                    const reply = replies[Math.floor(Math.random() * replies.length)];
-                    this.addMessage(reply, 'received');
-                }, delay);
-            }
-
-            escapeHtml(text) {
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
-            }
-
-            autoResize() {
-                this.messageInput.style.height = 'auto';
-                this.messageInput.style.height = Math.min(this.messageInput.scrollHeight, 120) + 'px';
-            }
-
-            goBack() {
-                this.chatScreen.classList.remove('show');
-                this.startModal.classList.remove('hide');
-                this.phoneInput.value = '';
-                this.phoneInput.focus();
-                this.sendBtn.disabled = true;
-            }
-        }
-
-        // Initialize when DOM is ready
-        document.addEventListener('DOMContentLoaded', () => {
-            new SMSChatApp();
-        });
-    </script>
-</body>
-</html>
+                    this.addMessage(msg.text, msg.type
