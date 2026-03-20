@@ -3,72 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PixGPT - Free Realistic AI Photos</title>
+    <title>PixGPT - FREE Realistic AI Photos</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
+        :root {
+            --primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success: linear-gradient(135deg, #10b981, #059669);
+            --warning: linear-gradient(135deg, #f59e0b, #d97706);
+            --danger: linear-gradient(135deg, #ef4444, #dc2626);
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: system-ui, -apple-system, sans-serif;
+            background: var(--primary);
             min-height: 100vh;
             padding: 1rem;
-            color: #333;
+            color: #1f2937;
         }
         .container {
-            max-width: 650px;
+            max-width: 700px;
             margin: 0 auto;
-            background: white;
-            border-radius: 25px;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+            background: #ffffff;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
             overflow: hidden;
         }
         .header {
-            background: linear-gradient(135deg, #ff6b6b, #4ecdc4, #45b7d1);
+            background: var(--primary);
             color: white;
             padding: 2.5rem 2rem;
             text-align: center;
         }
         .header h1 { 
             font-size: 2.8rem; 
-            font-weight: 800;
-            margin-bottom: 0.5rem;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            font-weight: 900;
+            margin-bottom: 0.3rem;
+            letter-spacing: -0.02em;
         }
-        .subtitle { font-size: 1.2rem; opacity: 0.95; }
+        .header p { 
+            opacity: 0.95; 
+            font-size: 1.15rem;
+            font-weight: 500;
+        }
         
-        .section {
-            padding: 2rem;
-        }
+        .content { padding: 2rem; }
         
         /* Age Gate */
-        .age-gate { 
-            background: linear-gradient(135deg, rgba(255,107,107,0.1), rgba(255,160,160,0.2));
-            border: 2px solid rgba(255,107,107,0.4);
+        .age-gate {
+            background: rgba(239,68,68,0.08);
+            border: 2px solid rgba(239,68,68,0.3);
             border-radius: 20px;
-            margin: 1rem;
+            padding: 2.5rem 2rem;
             text-align: center;
-        }
-        .age-title { 
-            color: #dc2626; 
-            font-size: 1.4rem; 
             margin-bottom: 1rem;
-            font-weight: 700;
+        }
+        .age-title {
+            color: #dc2626;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
         }
         
-        /* Input */
-        .input-group {
+        /* Form */
+        .input-row {
             display: flex;
             gap: 1rem;
-            margin: 1.5rem 0;
+            margin: 2rem 0;
         }
-        input[type="text"], input[type="number"] {
+        input {
             flex: 1;
-            padding: 1.3rem 1.5rem;
-            border: 3px solid #e2e8f0;
-            border-radius: 50px;
+            padding: 1.4rem 1.8rem;
+            border: 3px solid #e5e7eb;
+            border-radius: 9999px;
             font-size: 1.1rem;
             font-weight: 500;
-            transition: all 0.3s ease;
-            background: #f8fafc;
+            background: #f9fafb;
+            transition: all 0.2s;
         }
         input:focus {
             outline: none;
@@ -76,39 +86,65 @@
             box-shadow: 0 0 0 4px rgba(59,130,246,0.1);
             background: white;
         }
-        
-        button {
-            padding: 1.3rem 2.5rem;
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-            color: white;
+        .btn {
+            padding: 1.4rem 2.8rem;
             border: none;
-            border-radius: 50px;
+            border-radius: 9999px;
             font-size: 1.1rem;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(59,130,246,0.4);
+            transition: all 0.2s;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.1);
         }
-        button:hover:not(:disabled) { 
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(59,130,246,0.5);
+            box-shadow: 0 8px 25px rgba(102,126,234,0.4);
         }
-        button:disabled { 
-            opacity: 0.6; 
-            cursor: not-allowed; 
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
             transform: none;
-            background: #9ca3af;
+        }
+        
+        /* Examples */
+        .examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.2rem;
+            margin: 2.5rem 0;
+        }
+        .example {
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            border: 2px solid #bae6fd;
+            color: #0369a1;
+            padding: 1.5rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+        .example:hover {
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            color: white;
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(4,120,242,0.3);
         }
         
         /* Loading */
         .loading {
             display: none;
             text-align: center;
-            padding: 3rem 2rem;
+            padding: 3rem;
         }
         .spinner {
-            width: 50px;
-            height: 50px;
+            width: 56px;
+            height: 56px;
             border: 4px solid #f3f4f6;
             border-top: 4px solid #3b82f6;
             border-radius: 50%;
@@ -117,307 +153,9 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* Image */
-        .image-container {
+        /* Result */
+        .result {
             display: none;
-            padding: 2rem;
-            text-align: center;
-            animation: fadeIn 0.5s ease;
-        }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        #generatedImage {
-            max-width: 100%;
-            max-height: 550px;
-            border-radius: 25px;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.25);
-            margin-bottom: 2rem;
-        }
-        
-        /* Examples */
-        .examples {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin: 2rem 0;
-        }
-        .example-btn {
-            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
-            border: 2px solid #0ea5e9;
-            color: #0369a1;
-            padding: 1.2rem;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
-            text-align: center;
-        }
-        .example-btn:hover {
-            background: linear-gradient(135deg, #0ea5e9, #0284c7);
-            color: white;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(14,165,233,0.4);
-        }
-        
-        /* Telegram */
-        .telegram-section {
-            background: linear-gradient(135deg, #10b981, #059669);
-            color: white;
             text-align: center;
             padding: 2.5rem;
-        }
-        .telegram-btn {
-            display: inline-block;
-            background: rgba(255,255,255,0.2);
-            color: white;
-            text-decoration: none;
-            padding: 1.2rem 2.5rem;
-            border-radius: 50px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255,255,255,0.3);
-            transition: all 0.3s ease;
-            margin-top: 1rem;
-        }
-        .telegram-btn:hover {
-            background: rgba(255,255,255,0.3);
-            transform: translateY(-2px);
-        }
-        
-        .hidden { display: none !important; }
-        @media (max-width: 768px) {
-            .input-group { flex-direction: column; }
-            .header h1 { font-size: 2.2rem; }
-            .examples { grid-template-columns: 1fr; }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1>🎨 PixGPT</h1>
-            <p class="subtitle">Free Realistic AI Photos • Unlimited Telegram Bot</p>
-        </div>
-
-        <!-- Age Verification -->
-        <div id="ageGate" class="section age-gate">
-            <div class="age-title">🔐 18+ Age Verification Required</div>
-            <p><strong>India Law Compliance</strong> • One-time only • No data stored</p>
-            <div class="input-group">
-                <input type="number" id="birthYear" placeholder="Birth Year (e.g. 2005)" maxlength="4">
-                <button onclick="verifyAge()">✅ Verify Age</button>
-            </div>
-            <p style="font-size: 0.9rem; opacity: 0.8; margin-top: 1rem;">
-                Enter birth year → Unlock generator instantly
-            </p>
-        </div>
-
-        <!-- Generator -->
-        <div id="generator" class="hidden">
-            <div class="section">
-                <div class="input-group">
-                    <input type="text" id="prompt" placeholder="e.g. beautiful indian girl in saree, ultra realistic 8k portrait">
-                    <button onclick="generateImage()">✨ Generate Photo</button>
-                </div>
-                
-                <div class="examples">
-                    <div class="example-btn" onclick="setPrompt('beautiful indian bride in red lehenga, ultra realistic, 8k')">
-                        💍 Indian Bride
-                    </div>
-                    <div class="example-btn" onclick="setPrompt('handsome indian groom sherwani, photorealistic portrait, 8k')">
-                        👰 Groom Sherwani
-                    </div>
-                    <div class="example-btn" onclick="setPrompt('professional indian woman office wear, realistic portrait')">
-                        👩 Professional Woman
-                    </div>
-                    <div class="example-btn" onclick="setPrompt('young indian man modern suit, ultra realistic 8k')">
-                        👨 Man in Suit
-                    </div>
-                </div>
-            </div>
-
-            <!-- Loading -->
-            <div id="loading" class="loading">
-                <div class="spinner"></div>
-                <div style="font-size: 1.3rem; font-weight: 600; margin-top: 1rem;">
-                    Creating ultra-realistic photo...
-                </div>
-                <div style="font-size: 0.95rem; opacity: 0.8; margin-top: 0.5rem;">
-                    High quality 8K generation (30-60 seconds)
-                </div>
-            </div>
-
-            <!-- Result -->
-            <div id="imageContainer" class="image-container">
-                <img id="generatedImage" alt="AI Generated Realistic Photo">
-                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                    <button onclick="downloadImage()" style="background: linear-gradient(135deg, #10b981, #059669);">
-                        💾 Download HD PNG
-                    </button>
-                    <button onclick="generateAgain()" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
-                        🔄 New Photo
-                    </button>
-                    <button onclick="shareImage()" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
-                        📤 Share
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Telegram Bot -->
-        <div class="telegram-section">
-            <h2 style="font-size: 1.8rem; margin-bottom: 1rem;">📱 Telegram Bot</h2>
-            <p style="font-size: 1.1rem; margin-bottom: 1.5rem; opacity: 0.95;">
-                Unlimited photos • Instant delivery • No limits
-            </p>
-            <a href="https://t.me/PixGPTBot" class="telegram-btn" target="_blank">
-                🚀 Open PixGPT Bot Now
-            </a>
-            <p style="font-size: 0.95rem; margin-top: 1.5rem; opacity: 0.9;">
-                @PixGPTBot → /start → Send any description
-            </p>
-        </div>
-    </div>
-
-    <script>
-        const NSFW_WORDS = ['nude','naked','sex','porn','xxx','breast','penis','pussy','cock','boob','dick','fuck','nangi','chut','lund','bhosdi'];
-        let isVerified = localStorage.getItem('pixgpt_verified') === 'true';
-        let currentImage = null;
-
-        // Initialize
-        if (isVerified) {
-            document.getElementById('ageGate').style.display = 'none';
-            document.getElementById('generator').classList.remove('hidden');
-        }
-
-        function verifyAge() {
-            const year = document.getElementById('birthYear').value;
-            const birthYear = parseInt(year);
-            const currentYear = new Date().getFullYear();
-            
-            if (!year || isNaN(birthYear) || birthYear < 1900 || birthYear > currentYear - 18) {
-                alert(`❌ Invalid year! Must be born before ${currentYear - 18}`);
-                return;
-            }
-            
-            if (currentYear - birthYear >= 18) {
-                localStorage.setItem('pixgpt_verified', 'true');
-                document.getElementById('ageGate').style.display = 'none';
-                document.getElementById('generator').classList.remove('hidden');
-                document.getElementById('prompt').focus();
-            } else {
-                alert('❌ Sorry! You must be 18+ years old');
-            }
-        }
-
-        async function generateImage() {
-            const prompt = document.getElementById('prompt').value.trim();
-            
-            if (NSFW_WORDS.some(word => prompt.toLowerCase().includes(word))) {
-                alert('🚫 NSFW content blocked!\n\nTry: portraits, fashion, professional photos');
-                return;
-            }
-            if (!prompt) {
-                alert('📝 Please enter photo description!');
-                return;
-            }
-
-            const btn = event.target;
-            btn.disabled = true;
-            btn.textContent = '⏳ Generating...';
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('imageContainer').style.display = 'none';
-
-            try {
-                // Use PROVEN working API - SeaArt AI (Free, No CORS)
-                const enhancedPrompt = `${prompt}, ultra realistic, photorealistic, 8k, highly detailed, professional photography, cinematic lighting`;
-                
-                const response = await fetch('https://api.seaart.ai/v1/txt2img', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer free-token-here', // Free public
-                        'User-Agent': 'Mozilla/5.0'
-                    },
-                    body: JSON.stringify({
-                        prompt: enhancedPrompt,
-                        negative_prompt: 'cartoon, anime, blurry, low quality, deformed',
-                        width: 512,
-                        height: 768,
-                        steps: 30,
-                        cfg_scale: 7.5,
-                        sampler_name: 'DPM++ 2M Karras'
-                    })
-                });
-
-                if (!response.ok) throw new Error('API temporarily busy');
-
-                const data = await response.json();
-                const imageUrl = data.data[0]?.images?.[0];
-                
-                if (imageUrl) {
-                    currentImage = imageUrl;
-                    document.getElementById('generatedImage').src = imageUrl;
-                    document.getElementById('imageContainer').style.display = 'block';
-                } else {
-                    // FALLBACK: Use placeholder + redirect to Telegram
-                    throw new Error('Try Telegram bot for instant unlimited access!');
-                }
-
-            } catch (error) {
-                console.log('API Error:', error);
-                alert('🔥 Web generator busy!\n\n📱 Use Telegram bot for INSTANT unlimited photos!\n\nhttps://t.me/PixGPTBot');
-            } finally {
-                document.getElementById('loading').style.display = 'none';
-                btn.disabled = false;
-                btn.textContent = '✨ Generate Photo';
-            }
-        }
-
-        function setPrompt(text) {
-            document.getElementById('prompt').value = text;
-            document.getElementById('prompt').focus();
-        }
-
-        function downloadImage() {
-            if (currentImage) {
-                const a = document.createElement('a');
-                a.href = currentImage;
-                a.download = 'pixgpt-realistic.png';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-            }
-        }
-
-        function generateAgain() {
-            document.getElementById('imageContainer').style.display = 'none';
-            document.getElementById('prompt').focus();
-        }
-
-        function shareImage() {
-            if (navigator.share && currentImage) {
-                navigator.share({
-                    title: 'PixGPT Realistic Photo',
-                    text: 'Check this realistic AI photo!',
-                    url: currentImage
-                });
-            } else {
-                alert('Download & share manually!');
-            }
-        }
-
-        // Keyboard support
-        document.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.ctrlKey) {
-                const active = document.activeElement;
-                if (active.tagName === 'INPUT') generateImage();
-            }
-        });
-
-        // Auto focus
-        document.getElementById('birthYear' || 'prompt').focus();
-    </script>
-</body>
-</html>
+            animation: slideUp 
