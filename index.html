@@ -3,243 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SMS Bomber Tool</title>
+    <title>🔥 REAL SMS BOMBER - PUBLIC</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
         }
-
         .container {
-            background: white;
+            background: rgba(255,255,255,0.95);
             padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            max-width: 500px;
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            max-width: 450px;
             width: 100%;
-            text-align: center;
+            backdrop-filter: blur(10px);
         }
-
-        h1 {
-            color: #333;
-            margin-bottom: 30px;
-            font-size: 2.5em;
+        h1 { 
+            text-align: center; 
+            color: #333; 
+            margin-bottom: 30px; 
+            font-size: 2.2em;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-
-        .form-group {
-            margin-bottom: 25px;
-            text-align: left;
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
         }
-
         label {
             display: block;
             margin-bottom: 8px;
             color: #555;
-            font-weight: bold;
+            font-weight: 600;
         }
-
-        select, input, textarea {
+        input, select, textarea {
             width: 100%;
-            padding: 15px;
-            border: 2px solid #e1e5e9;
-            border-radius: 10px;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
             font-size: 16px;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
+            background: #f8f9fa;
         }
-
-        select:focus, input:focus, textarea:focus {
+        input:focus, select:focus, textarea:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #ff6b6b;
+            box-shadow: 0 0 0 4px rgba(255,107,107,0.1);
+            background: white;
         }
-
-        textarea {
-            resize: vertical;
-            min-height: 100px;
-            font-family: inherit;
-        }
-
-        .word-counter {
-            text-align: right;
-            color: #888;
-            font-size: 14px;
-            margin-top: 5px;
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        textarea { resize: vertical; min-height: 100px; }
+        .bomb-btn {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
             color: white;
             border: none;
-            padding: 18px 40px;
-            border-radius: 50px;
-            font-size: 18px;
+            border-radius: 20px;
+            font-size: 20px;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
+            transition: all 0.3s;
             margin-top: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        .bomb-btn:hover { transform: scale(1.05); box-shadow: 0 15px 30px rgba(255,107,107,0.4); }
+        .bomb-btn:active { transform: scale(0.98); }
+        .bomb-btn:disabled {
+            background: #ccc;
+            transform: none;
+            cursor: not-allowed;
         }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
         .status {
             margin-top: 20px;
             padding: 15px;
-            border-radius: 10px;
+            border-radius: 15px;
             font-weight: bold;
+            text-align: center;
             display: none;
         }
-
-        .success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .progress { background: #fff3cd; color: #856404; }
+        .char-count { text-align: right; color: #666; font-size: 14px; margin-top: 5px; }
         .warning {
             background: #fff3cd;
-            color: #856404;
             border: 1px solid #ffeaa7;
-        }
-
-        .country-flag {
-            font-size: 24px;
-            margin-right: 10px;
+            color: #856404;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>📱 SMS Bomber</h1>
+        <h1>💣 REAL SMS BOMBER</h1>
         
-        <div class="warning status" id="warningMsg">
-            ⚠️ Testing purpose only! Don't spam real numbers.
+        <div class="warning">
+            ⚠️ Public Testing Only | Legal Use | 10 SMS Free Daily
         </div>
 
-        <form id="smsForm">
-            <div class="form-group">
-                <label for="countryCode">🌍 Country Code</label>
-                <select id="countryCode">
-                    <option value="+91">🇮🇳 +91 (India)</option>
-                    <option value="+1">🇺🇸 +1 (USA)</option>
-                    <option value="+44">🇬🇧 +44 (UK)</option>
-                    <option value="+971">🇦🇪 +971 (UAE)</option>
-                    <option value="+880">🇧🇩 +880 (Bangladesh)</option>
-                    <option value="+92">🇵🇰 +92 (Pakistan)</option>
-                    <option value="+966">🇸🇦 +966 (Saudi Arabia)</option>
+        <form id="bomberForm">
+            <div class="input-group">
+                <label>🌍 Country Code</label>
+                <select id="country">
+                    <option value="91">🇮🇳 India (+91)</option>
+                    <option value="1">🇺🇸 USA (+1)</option>
+                    <option value="44">🇬🇧 UK (+44)</option>
+                    <option value="971">🇦🇪 UAE (+971)</option>
                 </select>
             </div>
 
-            <div class="form-group">
-                <label for="phoneNumber">📱 Phone Number</label>
-                <input type="tel" id="phoneNumber" placeholder="Enter phone number (without country code)" required>
+            <div class="input-group">
+                <label>📱 Phone Number</label>
+                <input type="tel" id="number" placeholder="9876543210" required>
             </div>
 
-            <div class="form-group">
-                <label for="message">💬 Custom Message</label>
-                <textarea id="message" placeholder="Type your message here... (e.g., Hello)" maxlength="500" required></textarea>
-                <div class="word-counter" id="wordCounter">0/500 characters</div>
+            <div class="input-group">
+                <label>💬 Message (160 chars)</label>
+                <textarea id="message" maxlength="160" placeholder="Hello! This is test message 🔥" required></textarea>
+                <div class="char-count" id="charCount">0/160</div>
             </div>
 
-            <button type="submit" class="btn" id="startBtn">
-                🚀 START BOMBER
+            <div class="input-group">
+                <label>💥 Bomb Count</label>
+                <input type="number" id="count" value="5" min="1" max="20" required>
+            </div>
+
+            <button type="submit" class="bomb-btn" id="bombBtn">
+                💥 START REAL SMS BOMB
             </button>
         </form>
 
-        <div class="status" id="statusMsg"></div>
+        <div class="status" id="status"></div>
     </div>
 
     <script>
-        const form = document.getElementById('smsForm');
-        const messageInput = document.getElementById('message');
-        const wordCounter = document.getElementById('wordCounter');
-        const statusMsg = document.getElementById('statusMsg');
-        const startBtn = document.getElementById('startBtn');
+        // TextLocal API - FREE SMS India
+        const API_KEY = 'apikey=YOUR_TEXTLOCAL_API_KEY'; // textlocal.in se free key lo
+        const SENDER = 'TXTLCL';
 
-        // Word counter
-        messageInput.addEventListener('input', function() {
-            const length = this.value.length;
-            wordCounter.textContent = `${length}/500 characters`;
+        const form = document.getElementById('bomberForm');
+        const status = document.getElementById('status');
+        const bombBtn = document.getElementById('bombBtn');
+        const message = document.getElementById('message');
+        const charCount = document.getElementById('charCount');
+
+        // Character counter
+        message.addEventListener('input', () => {
+            charCount.textContent = `${message.value.length}/160`;
         });
 
-        // Simulate SMS bombing
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const countryCode = document.getElementById('countryCode').value;
-            const phoneNumber = document.getElementById('phoneNumber').value;
-            const message = document.getElementById('message').value;
+            const country = document.getElementById('country').value;
+            const number = document.getElementById('number').value;
+            const msg = document.getElementById('message').value;
+            const count = parseInt(document.getElementById('count').value);
             
-            const fullNumber = countryCode + phoneNumber;
+            const fullNumber = `+${country}${number}`;
             
-            startBtn.textContent = '⏳ Sending...';
-            startBtn.disabled = true;
-            showStatus('Sending SMS to ' + fullNumber + '...', 'success');
+            bombBtn.disabled = true;
+            bombBtn.textContent = '💥 SENDING...';
+            showStatus('🚀 Starting SMS Bomb...', 'progress');
+
+            let successCount = 0;
             
-            // Simulate bombing (10 SMS with delay)
-            let count = 0;
-            const maxSMS = 10;
-            
-            const interval = setInterval(() => {
-                count++;
-                showStatus(`SMS ${count}/${maxSMS} sent: "${message.substring(0, 20)}..."`, 'success');
-                
-                if (count >= maxSMS) {
-                    clearInterval(interval);
-                    startBtn.textContent = '✅ BOMBER COMPLETE';
-                    startBtn.style.background = 'linear-gradient(135deg, #28a745 0%, #20c997 100%)';
-                    setTimeout(() => {
-                        startBtn.textContent = '🚀 START AGAIN';
-                        startBtn.style.background = '';
-                        startBtn.disabled = false;
-                        form.reset();
-                        hideStatus();
-                    }, 3000);
+            for(let i = 1; i <= count; i++) {
+                try {
+                    const response = await fetch(`https://api.textlocal.in/send/?${API_KEY}&message=${encodeURIComponent(msg)}&numbers=${fullNumber}&sender=${SENDER}`);
+                    const data = await response.json();
+                    
+                    if(data.status === 'success') {
+                        successCount++;
+                        showStatus(`✅ SMS ${i}/${count} sent successfully! (${successCount} total)`, 'success');
+                    } else {
+                        showStatus(`❌ SMS ${i} failed: ${data.errors[0].message}`, 'error');
+                    }
+                } catch(error) {
+                    showStatus(`❌ Network error on SMS ${i}: ${error.message}`, 'error');
                 }
-            }, 1000);
+                
+                // 2 second delay between SMS
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+            
+            bombBtn.disabled = false;
+            bombBtn.textContent = '💥 START AGAIN';
+            showStatus(`🎉 Bomb Complete! ${successCount}/${count} SMS delivered!`, 'success');
         });
 
-        function showStatus(message, type) {
-            statusMsg.textContent = message;
-            statusMsg.className = `status ${type}`;
-            statusMsg.style.display = 'block';
+        function showStatus(msg, type) {
+            status.textContent = msg;
+            status.className = `status ${type}`;
+            status.style.display = 'block';
         }
-
-        function hideStatus() {
-            statusMsg.style.display = 'none';
-        }
-
-        // Show warning on load
-        window.onload = () => {
-            document.getElementById('warningMsg').style.display = 'block';
-            setTimeout(() => {
-                document.getElementById('warningMsg').style.display = 'none';
-            }, 5000);
-        };
     </script>
 </body>
 </html>
