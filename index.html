@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📱 SMS Chat - Real Time</title>
-    <script src="https://unpkg.com/socket.io-client@4/dist/socket.io.js"></script>
+    <title>📱 SMS Chat - Perfect</title>
     <style>
         * {
             margin: 0; padding: 0; box-sizing: border-box;
@@ -15,34 +14,40 @@
             overflow: hidden;
         }
 
-        /* START MODAL */
+        /* MODAL */
         .modal {
             position: fixed; inset: 0; background: rgba(0,0,0,0.9);
             display: flex; align-items: center; justify-content: center; z-index: 1000;
+            opacity: 1; transition: opacity 0.3s ease;
         }
+        .modal.hide { opacity: 0; pointer-events: none; }
         .modal-content {
             background: white; border-radius: 24px; padding: 40px 32px;
-            text-align: center; max-width: 380px; width: 90%; transform: scale(0.9);
-            transition: transform 0.3s ease;
+            text-align: center; max-width: 380px; width: 90%;
+            transform: scale(1); transition: all 0.3s ease;
         }
-        .modal.show .modal-content { transform: scale(1); }
         .modal h1 { font-size: 28px; margin-bottom: 8px; color: #1a1a1a; }
         .modal p { color: #666; margin-bottom: 32px; }
         #phoneInput {
             width: 100%; padding: 16px 20px; border: 2px solid #e1e5e9;
-            border-radius: 50px; font-size: 18px; margin-bottom: 20px; outline: none;
+            border-radius: 50px; font-size: 18px; margin-bottom: 20px;
+            outline: none; font-family: inherit;
         }
         #phoneInput:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.2); }
         #startBtn {
             width: 100%; padding: 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white; border: none; border-radius: 50px; font-size: 18px; cursor: pointer;
-            transition: all 0.3s;
+            color: white; border: none; border-radius: 50px; font-size: 18px;
+            cursor: pointer; transition: all 0.3s; font-family: inherit;
         }
-        #startBtn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(102,126,234,0.3); }
+        #startBtn:hover:not(:disabled) { 
+            transform: translateY(-2px); box-shadow: 0 10px 20px rgba(102,126,234,0.3); 
+        }
         #startBtn:disabled { opacity: 0.6; cursor: not-allowed; }
-        .error { color: #ef4444; font-size: 14px; margin-top: 10px; display: none; }
+        .error { 
+            color: #ef4444; font-size: 14px; margin-top: 10px; display: none; 
+        }
 
-        /* CHAT SCREEN */
+        /* CHAT */
         .chat-screen {
             height: 100vh; display: flex; flex-direction: column;
             background: #f8f9fa; transform: translateX(100%);
@@ -56,6 +61,7 @@
         .back-btn {
             width: 44px; height: 44px; border-radius: 50%; background: none;
             border: none; font-size: 20px; cursor: pointer; color: #6b7280;
+            display: flex; align-items: center; justify-content: center;
         }
         .back-btn:hover { background: #f3f4f6; }
         .contact-info { flex: 1; }
@@ -69,7 +75,7 @@
         .message {
             margin-bottom: 16px; max-width: 75%; padding: 12px 16px;
             border-radius: 20px; animation: slideIn 0.3s ease-out;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); word-wrap: break-word;
         }
         .message.sent {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -77,17 +83,18 @@
         }
         .message.received {
             background: white; color: #374151; border-bottom-left-radius: 6px;
-            margin-right: auto;
+            margin-right: auto; border: 1px solid #e5e7eb;
         }
         .message-time {
-            font-size: 12px; opacity: 0.8; margin-top: 4px; text-align: right;
+            font-size: 12px; opacity: 0.8; margin-top: 4px;
         }
         .typing {
             display: flex; gap: 4px; padding: 12px 16px; margin-bottom: 16px;
+            max-width: 75%; margin-right: auto;
         }
         .typing-dot {
             width: 8px; height: 8px; background: #9ca3af; border-radius: 50%;
-            animation: typing 1.4s infinite;
+            animation: typing 1.4s infinite ease-in-out;
         }
         .typing-dot:nth-child(2) { animation-delay: 0.2s; }
         .typing-dot:nth-child(3) { animation-delay: 0.4s; }
@@ -98,17 +105,17 @@
         }
         #messageInput {
             flex: 1; padding: 16px 20px; border: 1px solid #d1d5db;
-            border-radius: 25px; font-size: 16px; outline: none; resize: none;
-            max-height: 120px;
+            border-radius: 25px; font-size: 16px; outline: none; resize: vertical;
+            font-family: inherit; line-height: 1.4; max-height: 120px;
         }
         #messageInput:focus {
             border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
         }
         #sendBtn {
-            width: 56px; height: 56px; border: none;
+            width: 56px; height: 56px; border: none; border-radius: 50%;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white; border-radius: 50%; font-size: 18px; cursor: pointer;
-            transition: all 0.3s;
+            color: white; font-size: 18px; cursor: pointer; transition: all 0.3s;
+            flex-shrink: 0; display: flex; align-items: center; justify-content: center;
         }
         #sendBtn:hover:not(:disabled) { transform: scale(1.05); }
         #sendBtn:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -128,9 +135,10 @@
             .modal-content { margin: 20px; padding: 32px 24px; }
             .chat-header { padding: 16px; }
             .messages { padding: 16px 12px; }
+            .input-area { padding: 16px; }
         }
 
-        /* HIDE SCROLLBAR */
+        /* SCROLLBAR */
         .messages::-webkit-scrollbar { width: 4px; }
         .messages::-webkit-scrollbar-track { background: transparent; }
         .messages::-webkit-scrollbar-thumb { 
@@ -139,173 +147,204 @@
     </style>
 </head>
 <body>
-    <!-- START SCREEN -->
-    <div id="startScreen" class="modal show">
+    <!-- START MODAL -->
+    <div id="startModal" class="modal">
         <div class="modal-content">
             <h1>📱 SMS Chat</h1>
-            <p>Enter phone number to start messaging</p>
+            <p>Enter phone number to start real-time chat</p>
             <input type="tel" id="phoneInput" placeholder="+1 (555) 123-4567" maxlength="14">
-            <button id="startBtn">Start Chat</button>
-            <div id="errorMsg" class="error">Please enter valid phone number</div>
+            <button id="startBtn">🚀 Start Chat</button>
+            <div id="errorMsg" class="error">Please enter valid 10-digit phone number</div>
         </div>
     </div>
 
     <!-- CHAT SCREEN -->
     <div id="chatScreen" class="chat-screen">
         <div class="chat-header">
-            <button id="backBtn" class="back-btn">←</button>
+            <button id="backBtn" class="back-btn" aria-label="Back">←</button>
             <div class="contact-info">
-                <div id="contactName" class="contact-name">Unknown</div>
-                <div id="contactNumber" class="contact-number"></div>
+                <div id="contactName" class="contact-name">Mobile User</div>
+                <div id="contactNumber" class="contact-number">+1 (555) 123-4567</div>
             </div>
         </div>
         
         <div id="messages" class="messages">
-            <div class="message received">
-                <div>👋 Welcome to SMS Chat!</div>
-                <div class="message-time">Just now</div>
-            </div>
-            <div class="message sent">
-                <div>Ready to send messages! 📱</div>
-                <div class="message-time">Just now</div>
-            </div>
+            <!-- Messages will load here -->
         </div>
         
         <div class="input-area">
-            <textarea id="messageInput" placeholder="Type your message..."></textarea>
-            <button id="sendBtn">📤</button>
+            <textarea id="messageInput" placeholder="💬 Type your message..." rows="1"></textarea>
+            <button id="sendBtn" disabled>📤</button>
         </div>
     </div>
 
     <script>
-        class SMSChat {
+        class SMSChatApp {
             constructor() {
                 this.currentPhone = '';
-                this.conversations = JSON.parse(localStorage.getItem('smsChats')) || {};
-                this.initElements();
-                this.bindEvents();
-                this.simulateConnection();
+                this.conversations = this.loadConversations();
+                this.typingIndicator = null;
+                this.init();
             }
 
-            initElements() {
-                this.startScreen = document.getElementById('startScreen');
+            init() {
+                // Elements
+                this.startModal = document.getElementById('startModal');
                 this.chatScreen = document.getElementById('chatScreen');
                 this.phoneInput = document.getElementById('phoneInput');
                 this.startBtn = document.getElementById('startBtn');
                 this.errorMsg = document.getElementById('errorMsg');
                 this.backBtn = document.getElementById('backBtn');
-                this.contactName = document.getElementById('contactName');
-                this.contactNumber = document.getElementById('contactNumber');
-                this.messages = document.getElementById('messages');
+                this.contactNameEl = document.getElementById('contactName');
+                this.contactNumberEl = document.getElementById('contactNumber');
+                this.messagesEl = document.getElementById('messages');
                 this.messageInput = document.getElementById('messageInput');
                 this.sendBtn = document.getElementById('sendBtn');
-            }
 
-            bindEvents() {
-                this.startBtn.onclick = () => this.startChat();
-                this.sendBtn.onclick = () => this.sendMessage();
-                this.backBtn.onclick = () => this.goBack();
-                this.messageInput.onkeypress = (e) => {
+                // Events
+                this.startBtn.addEventListener('click', () => this.startChat());
+                this.sendBtn.addEventListener('click', () => this.sendMessage());
+                this.backBtn.addEventListener('click', () => this.goBack());
+                this.messageInput.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                         e.preventDefault();
                         this.sendMessage();
                     }
-                };
-                this.phoneInput.oninput = () => this.formatPhoneInput();
+                });
+                this.messageInput.addEventListener('input', () => this.autoResize());
+                this.phoneInput.addEventListener('input', () => this.formatPhone());
+
+                // Focus
+                this.phoneInput.focus();
             }
 
-            formatPhoneInput() {
+            loadConversations() {
+                try {
+                    return JSON.parse(localStorage.getItem('smsConversations')) || {};
+                } catch {
+                    return {};
+                }
+            }
+
+            saveConversations() {
+                localStorage.setItem('smsConversations', JSON.stringify(this.conversations));
+            }
+
+            formatPhone() {
                 let val = this.phoneInput.value.replace(/\D/g, '');
                 if (val.length > 11) val = val.slice(0, 11);
+                
                 if (val.length >= 10) {
-                    this.phoneInput.value = '+1 ' + val.slice(0,3) + ' ' + 
+                    const formatted = '+1 (' + val.slice(0,3) + ') ' + 
                         val.slice(3,6) + '-' + val.slice(6,10);
+                    this.phoneInput.value = formatted;
+                    this.errorMsg.style.display = 'none';
+                    this.startBtn.disabled = false;
+                } else {
+                    this.startBtn.disabled = true;
                 }
-                this.errorMsg.style.display = 'none';
             }
 
-            async startChat() {
+            startChat() {
                 const phone = this.phoneInput.value.replace(/\D/g, '');
-                if (phone.length < 10) {
+                if (phone.length !== 10) {
                     this.errorMsg.style.display = 'block';
                     return;
                 }
 
                 this.currentPhone = '+1' + phone;
-                this.contactNumber.textContent = this.phoneInput.value;
-                this.contactName.textContent = 'Mobile User';
+                this.contactNumberEl.textContent = this.phoneInput.value;
+                this.contactNameEl.textContent = 'Mobile User';
 
-                // Load conversation
+                // Load history
                 const convo = this.conversations[this.currentPhone] || [];
                 this.renderMessages(convo);
 
-                this.startScreen.classList.remove('show');
+                // Show chat
+                this.startModal.classList.add('hide');
                 this.chatScreen.classList.add('show');
                 this.messageInput.focus();
             }
 
             sendMessage() {
-                const message = this.messageInput.value.trim();
-                if (!message || !this.currentPhone) return;
+                const text = this.messageInput.value.trim();
+                if (!text || !this.currentPhone) return;
 
                 // Add sent message
-                this.addMessage(message, 'sent');
+                this.addMessage(text, 'sent');
                 this.messageInput.value = '';
 
-                // Simulate API response
-                this.simulateReply();
+                // Show typing + reply
+                this.showTyping();
+                this.scheduleReply();
             }
 
-            addMessage(text, type, time = new Date()) {
-                const div = document.createElement('div');
-                div.className = `message ${type}`;
-                div.innerHTML = `
-                    <div>${text}</div>
-                    <div class="message-time">${time.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}</div>
+            addMessage(text, type) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${type}`;
+                
+                const now = new Date();
+                messageDiv.innerHTML = `
+                    <div>${this.escapeHtml(text)}</div>
+                    <div class="message-time">${now.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}</div>
                 `;
-                this.messages.appendChild(div);
-                this.messages.scrollTop = this.messages.scrollHeight;
 
-                // Save to localStorage
-                if (!this.conversations[this.currentPhone]) this.conversations[this.currentPhone] = [];
-                this.conversations[this.currentPhone].push({ text, type, time: time.toISOString() });
-                localStorage.setItem('smsChats', JSON.stringify(this.conversations));
+                this.messagesEl.appendChild(messageDiv);
+                this.messagesEl.scrollTop = this.messagesEl.scrollHeight;
+
+                // Save conversation
+                if (!this.conversations[this.currentPhone]) {
+                    this.conversations[this.currentPhone] = [];
+                }
+                this.conversations[this.currentPhone].push({
+                    text: text,
+                    type: type,
+                    time: now.toISOString()
+                });
+                this.saveConversations();
             }
 
             renderMessages(messages) {
-                this.messages.innerHTML = '';
+                this.messagesEl.innerHTML = '';
                 messages.forEach(msg => {
                     const time = new Date(msg.time);
                     this.addMessage(msg.text, msg.type, time);
                 });
             }
 
-            async simulateReply() {
-                // Show typing
-                const typing = document.createElement('div');
-                typing.className = 'typing';
-                typing.innerHTML = `
+            showTyping() {
+                this.typingIndicator = document.createElement('div');
+                this.typingIndicator.className = 'typing';
+                this.typingIndicator.innerHTML = `
                     <div class="typing-dot"></div>
                     <div class="typing-dot"></div>
                     <div class="typing-dot"></div>
                 `;
-                this.messages.appendChild(typing);
-                this.messages.scrollTop = this.messages.scrollHeight;
+                this.messagesEl.appendChild(this.typingIndicator);
+                this.messagesEl.scrollTop = this.messagesEl.scrollHeight;
+            }
 
-                // Random delay + reply
-                const delay = 1000 + Math.random() * 2000;
+            hideTyping() {
+                if (this.typingIndicator) {
+                    this.typingIndicator.remove();
+                    this.typingIndicator = null;
+                }
+            }
+
+            scheduleReply() {
+                const delay = 1500 + Math.random() * 2500;
                 setTimeout(() => {
-                    this.messages.removeChild(typing);
+                    this.hideTyping();
                     
                     const replies = [
-                        "Hey! Thanks for the message! 📱",
-                        "Nice to hear from you! What's up?",
-                        "Got your message! 😊 How are you?",
-                        "Perfect! Everything good?",
-                        "Thanks! Talk soon! 👋",
-                        "Awesome! 👍",
-                        "Received! All good here!",
-                        "Sweet! 😎"
+                        "Hey! Got your message 😊",
+                        "Thanks for writing! What's up?",
+                        "Perfect! How are you doing?",
+                        "Nice! Everything good? 👍",
+                        "Received! Talk soon 👋",
+                        "Sweet! 😎",
+                        "Hey there! All good?",
+                        "Thanks! Have a great day! 🌟"
                     ];
                     
                     const reply = replies[Math.floor(Math.random() * replies.length)];
@@ -313,26 +352,29 @@
                 }, delay);
             }
 
-            simulateConnection() {
-                // Fake online status
-                setInterval(() => {
-                    if (Math.random() > 0.7 && this.chatScreen.classList.contains('show')) {
-                        this.addMessage("🤖 I'm online now!", 'received');
-                    }
-                }, 30000);
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            autoResize() {
+                this.messageInput.style.height = 'auto';
+                this.messageInput.style.height = Math.min(this.messageInput.scrollHeight, 120) + 'px';
             }
 
             goBack() {
                 this.chatScreen.classList.remove('show');
-                this.startScreen.classList.add('show');
+                this.startModal.classList.remove('hide');
                 this.phoneInput.value = '';
                 this.phoneInput.focus();
+                this.sendBtn.disabled = true;
             }
         }
 
-        // START APP
-        window.addEventListener('load', () => {
-            new SMSChat();
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            new SMSChatApp();
         });
     </script>
 </body>
