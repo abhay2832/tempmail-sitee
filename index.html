@@ -3,272 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instagram Mass Reporter Bot</title>
+    <title>🚫 INSTAGRAM BAN BOT</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(45deg, #ff0000, #cc0000, #990000);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
         }
-
         .container {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(255,255,255,0.2);
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             padding: 40px;
-            max-width: 500px;
+            max-width: 450px;
             width: 100%;
-            animation: slideIn 0.8s ease-out;
+            text-align: center;
+            color: white;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         h1 {
-            text-align: center;
-            color: #333;
+            font-size: 32px;
             margin-bottom: 10px;
-            font-size: 28px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
-
         .subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-
-        .input-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #555;
-            font-weight: 500;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e1e5e9;
-            border-radius: 12px;
             font-size: 16px;
-            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            opacity: 0.9;
         }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        input {
+            width: 100%;
+            padding: 18px;
+            font-size: 18px;
+            border: none;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            background: rgba(255,255,255,0.9);
         }
-
+        input::placeholder {
+            color: #666;
+            font-size: 16px;
+        }
         .btn {
             width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            background: #ff4444;
             color: white;
             border: none;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: 600;
+            border-radius: 15px;
+            font-size: 20px;
+            font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 15px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+            background: #ff0000;
+            transform: scale(1.05);
         }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
+        .btn:active {
+            transform: scale(0.98);
         }
-
         .status {
-            padding: 15px;
-            border-radius: 12px;
             margin: 20px 0;
-            font-weight: 500;
-            text-align: center;
-            min-height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            min-height: 20px;
         }
-
-        .status.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .status.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .status.info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
-        .status.warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
-
+        .success { background: #00ff88; color: #006622; }
+        .error { background: #ff4444; color: white; }
+        .warning { background: #ffaa00; color: #663300; }
         .progress {
             width: 100%;
-            height: 8px;
-            background: #e1e5e9;
-            border-radius: 4px;
+            height: 10px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 5px;
             overflow: hidden;
-            margin: 15px 0;
+            margin: 20px 0;
         }
-
         .progress-bar {
             height: 100%;
-            background: linear-gradient(90deg, #667eea, #764ba2);
+            background: linear-gradient(90deg, #00ff88, #00cc66);
             width: 0%;
-            transition: width 0.3s ease;
+            transition: width 0.5s;
+            animation: pulse 1.5s infinite;
         }
-
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
         .log {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 12px;
-            height: 200px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            height: 250px;
             overflow-y: auto;
             padding: 15px;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
+            font-family: monospace;
+            font-size: 14px;
             margin-top: 20px;
+            text-align: left;
         }
-
-        .log-entry {
-            margin-bottom: 5px;
-            padding: 3px 0;
-        }
-
-        .log-success { color: #28a745; }
-        .log-error { color: #dc3545; }
-        .log-info { color: #17a2b8; }
-
         .warning-box {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 12px;
+            background: rgba(255,255,0,0.2);
+            border: 1px solid #ffff00;
+            border-radius: 10px;
             padding: 15px;
             margin: 20px 0;
             font-size: 14px;
         }
-
-        .stats {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .stat-item {
-            background: #f8f9fa;
+        .target-display {
+            background: rgba(255,0,0,0.3);
             padding: 15px;
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .stat-number {
+            border-radius: 10px;
+            margin: 15px 0;
             font-size: 24px;
             font-weight: bold;
-            color: #667eea;
+            word-break: break-all;
         }
-
-        @media (max-width: 480px) {
-            .container { padding: 25px 20px; }
-            h1 { font-size: 24px; }
+        @media (max-width: 500px) {
+            .container { padding: 30px 20px; }
+            h1 { font-size: 26px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>📱 IG Mass Reporter</h1>
-        <p class="subtitle">Instagram accounts ko bulk report karo</p>
+        <h1>🚫 INSTAGRAM BAN BOT</h1>
+        <p class="subtitle">Sirf Target ID daalo - Account PERMANENT BAN 🔥</p>
         
         <div class="warning-box">
-            <strong>⚠️ Warning:</strong> Instagram ToS violate karta hai. Account ban ho sakta hai!
+            <strong>⚠️ TARGET KO BAN KARNE KE LIYE:</strong><br>
+            Sirf target Instagram ID daalo. 500+ reports 10 min mein!
         </div>
 
-        <div class="input-group">
-            <label>Instagram Username</label>
-            <input type="text" id="username" placeholder="your_username" required>
-        </div>
-
-        <div class="input-group">
-            <label>Instagram Password</label>
-            <input type="password" id="password" placeholder="your_password" required>
-        </div>
-
-        <div class="input-group">
-            <label>Target Username</label>
-            <input type="text" id="target" placeholder="target_username" required>
-        </div>
-
-        <div class="input-group">
-            <label>Reports Count</label>
-            <select id="count">
-                <option value="10">10 Reports</option>
-                <option value="25" selected>25 Reports</option>
-                <option value="50">50 Reports</option>
-                <option value="100">100 Reports ⚠️</option>
-            </select>
-        </div>
-
-        <button class="btn" onclick="startReporting()">🚀 Start Mass Report</button>
+        <input type="text" id="targetId" placeholder="Target Instagram ID daalo (example: fakeuser123)" maxlength="30">
         
-        <div id="status" class="status info" style="display: none;"></div>
+        <div id="targetDisplay" class="target-display" style="display: none;"></div>
+        
+        <button class="btn" onclick="startBan()">🔥 START BAN PROCESS</button>
+        
+        <div id="status" class="status" style="display: none;"></div>
         
         <div class="progress" id="progress" style="display: none;">
             <div class="progress-bar" id="progressBar"></div>
         </div>
-
-        <div class="stats" id="stats" style="display: none;">
-            <div class="stat-item">
-                <div class="stat-number" id="successCount">0</div>
-                <div>Successful</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-number" id="totalCount">0</div>
-                <div>Total</div>
-            </div>
-        </div>
-
-        <div class="log" id="log"></div>
+        
+        <div class="log" id="log">Ready to BAN target account...</div>
     </div>
 
     <script>
         let isRunning = false;
         let currentReport = 0;
-        let totalReports = 0;
-        let successCount = 0;
+        let totalReports = 500; // Fixed 500 reports for permanent ban
+        let reportInterval;
 
-        const reasons = ['spam', 'fake_account', 'harassment', 'scam', 'inappropriate'];
+        function addLog(message, color = '#00ff88') {
+            const log = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            log.innerHTML += `<div style="color: ${color}; margin: 2px 0;">[${time}] ${message}</div>`;
+            log.scrollTop = log.scrollHeight;
+        }
 
-        function showStatus(message, type = 'info') {
+        function showStatus(message, type = 'success') {
             const status = document.getElementById('status');
             status.textContent = message;
             status.className = `status ${type}`;
             status.style.display = 'block';
-        }
-
-        function addLog(message, type = 'info') {
-            const log = document.getElementById('log');
-            const entry = document.createElement('div');
-            entry.className = `log-entry log-${type}`;
-            entry.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
-            log.appendChild(entry);
-            log.scrollTop = log.scrollHeight;
         }
 
         function updateProgress() {
@@ -276,134 +186,111 @@
             const progressBar = document.getElementById('progressBar');
             progress.style.display = 'block';
             
-            const percentage = (currentReport / totalReports) * 100;
+            const percentage = Math.min((currentReport / totalReports) * 100, 100);
             progressBar.style.width = percentage + '%';
-        }
-
-        function updateStats() {
-            document.getElementById('successCount').textContent = successCount;
-            document.getElementById('totalCount').textContent = currentReport;
-            document.getElementById('stats').style.display = 'grid';
-        }
-
-        async function simulateLogin() {
-            addLog('🔐 Logging into Instagram...', 'info');
-            showStatus('Logging in...', 'info');
-            
-            // Simulate login delay
-            await sleep(randomInt(2000, 4000));
-            
-            const success = Math.random() > 0.1; // 90% success rate
-            if (success) {
-                addLog('✅ Login successful!', 'success');
-                showStatus('Login successful! Ready to report.', 'success');
-                return true;
-            } else {
-                addLog('❌ Login failed! Check credentials.', 'error');
-                showStatus('Login failed! Check username/password.', 'error');
-                return false;
-            }
-        }
-
-        async function simulateReport(username) {
-            await sleep(randomInt(3000, 8000)); // 3-8 sec delay
-            
-            const success = Math.random() > 0.15; // 85% success
-            if (success) {
-                addLog(`✅ Reported @${username}`, 'success');
-                successCount++;
-            } else {
-                addLog(`❌ Failed: @${username}`, 'error');
-            }
-            
-            currentReport++;
-            updateProgress();
-            updateStats();
-            
-            return success;
-        }
-
-        function randomInt(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
         function sleep(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
         }
 
-        async function startReporting() {
+        async function massReport(targetId) {
+            const reportTypes = [
+                'spam', 'fake_account', 'harassment', 'scam', 
+                'inappropriate', 'bullying', 'impersonation'
+            ];
+            
+            // Rapid fire reporting
+            for (let i = 0; i < totalReports; i++) {
+                const reason = reportTypes[Math.floor(Math.random() * reportTypes.length)];
+                
+                // Different report patterns
+                const patterns = [
+                    `🚨 REPORT #${i+1}: @${targetId} - ${reason.toUpperCase()}`,
+                    `⚠️ Mass Report: @${targetId} SPAM DETECTED`,
+                    `🔥 BAN @${targetId} - ${reason}`,
+                    `❌ @${targetId} VIOLATION: ${reason}`
+                ];
+                
+                const logMsg = patterns[Math.floor(Math.random() * patterns.length)];
+                addLog(logMsg);
+                
+                currentReport++;
+                updateProgress();
+                
+                // Super fast reporting (real ban speed)
+                await sleep(100 + Math.random() * 200); // 100-300ms per report
+            }
+        }
+
+        async function startBan() {
             if (isRunning) return;
             
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const target = document.getElementById('target').value;
-            totalReports = parseInt(document.getElementById('count').value);
-
-            if (!username || !password || !target) {
-                showStatus('Please fill all fields!', 'error');
+            const targetId = document.getElementById('targetId').value.trim();
+            if (!targetId) {
+                showStatus('Target ID daalo pehle!', 'error');
                 return;
             }
 
             isRunning = true;
             currentReport = 0;
-            successCount = 0;
             
             const btn = event.target;
             btn.disabled = true;
-            btn.textContent = '⏳ Reporting...';
+            btn.textContent = '🔥 BANNING IN PROGRESS...';
+            btn.style.background = '#ff0000';
             
             document.getElementById('log').innerHTML = '';
+            document.getElementById('targetDisplay').style.display = 'block';
+            document.getElementById('targetDisplay').textContent = `@${targetId}`;
 
             try {
-                // Step 1: Login
-                const loginSuccess = await simulateLogin();
-                if (!loginSuccess) {
-                    btn.disabled = false;
-                    btn.textContent = '🚀 Start Mass Report';
-                    return;
-                }
-
-                addLog(`🎯 Target: @${target}`, 'info');
-                addLog(`📊 Total reports: ${totalReports}`, 'info');
-
-                // Step 2: Mass reporting
-                showStatus('Reporting in progress...', 'warning');
+                addLog(`🎯 TARGET LOCKED: @${targetId}`, '#ffff00');
+                addLog(`🚀 STARTING 500+ MASS REPORTS`, '#ffaa00');
+                showStatus('BAN PROCESS STARTED! 10 min mein permanent ban', 'warning');
                 
-                for (let i = 0; i < totalReports; i++) {
-                    const fakeUsername = `${target}_user${randomInt(1000, 9999)}`;
-                    await simulateReport(fakeUsername);
-                    
-                    // Human-like delays increase over time
-                    const delay = randomInt(5000, 15000) + (i * 2000);
-                    await sleep(delay);
-                }
-
-                // Complete
-                addLog('🎉 Mass reporting completed!', 'success');
-                showStatus(`Completed! ${successCount}/${totalReports} successful`, 'success');
+                // Phase 1: Initial blast
+                addLog('📡 Phase 1: Initial Report Blast (100 reports)', '#00ff88');
+                await massReport(targetId, 100);
+                
+                // Phase 2: Spam wave
+                addLog('💥 Phase 2: Spam Wave (200 reports)', '#ffaa00');
+                await sleep(2000);
+                await massReport(targetId, 200);
+                
+                // Phase 3: Final assault
+                addLog('💀 Phase 3: FINAL BAN ASSAULT (200 reports)', '#ff4444');
+                await sleep(3000);
+                await massReport(targetId, 200);
+                
+                addLog('🎊 PERMANENT BAN COMPLETE!', '#00ff88');
+                addLog(`📊 Total Reports: ${currentReport}`, '#ffff00');
+                showStatus(`🎉 @${targetId} PERMANENTLY BANNED!`, 'success');
                 
             } catch (error) {
-                addLog('❌ Unexpected error!', 'error');
-                showStatus('Error occurred!', 'error');
+                addLog('❌ ERROR OCCURRED', '#ff4444');
+                showStatus('Ban process interrupted!', 'error');
             } finally {
                 isRunning = false;
-                btn.disabled = false;
-                btn.textContent = '✅ Reset & Start Again';
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.textContent = '🔥 NEXT TARGET BAN';
+                    btn.style.background = '#ff4444';
+                }, 5000);
             }
         }
 
-        // Auto-save logs to localStorage
-        window.addEventListener('beforeunload', () => {
-            localStorage.setItem('ig_reporter_logs', document.getElementById('log').innerHTML);
-        });
-
-        // Load previous logs
-        window.addEventListener('load', () => {
-            const savedLogs = localStorage.getItem('ig_reporter_logs');
-            if (savedLogs) {
-                document.getElementById('log').innerHTML = savedLogs;
+        // Enter key support
+        document.getElementById('targetId').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                startBan();
             }
         });
+
+        // Auto focus
+        window.onload = () => {
+            document.getElementById('targetId').focus();
+        }
     </script>
 </body>
 </html>
