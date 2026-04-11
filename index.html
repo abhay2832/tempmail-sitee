@@ -1,232 +1,38 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🚀 REAL IG MASS REPORTER - WORKING</title>
-    <style>
-        *{margin:0;padding:0;box-sizing:border-box;}
-        body{
-            background:linear-gradient(135deg,#ff6b6b,#4ecdc4);
-            height:100vh;display:flex;align-items:center;justify-content:center;
-            font-family:'Arial',sans-serif;padding:20px;overflow:hidden;
-        }
-        .container{
-            background:white;border-radius:20px;padding:40px;
-            max-width:500px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3);
-            text-align:center;
-        }
-        h1{
-            color:#333;font-size:28px;margin-bottom:10px;
-            background:linear-gradient(45deg,#ff6b6b,#4ecdc4);-webkit-background-clip:text;
-            -webkit-text-fill-color:transparent;background-clip:text;
-        }
-        input{
-            width:100%;padding:15px;margin:15px 0;border:2px solid #eee;
-            border-radius:12px;font-size:16px;text-align:center;
-            transition:all 0.3s;
-        }
-        input:focus{outline:none;border-color:#ff6b6b;box-shadow:0 0 20px rgba(255,107,107,0.3);}
-        button{
-            width:100%;padding:18px;background:linear-gradient(45deg,#ff6b6b,#4ecdc4);
-            color:white;border:none;border-radius:12px;font-size:18px;font-weight:bold;
-            cursor:pointer;transition:all 0.3s;margin:10px 0;
-        }
-        button:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(255,107,107,0.4);}
-        .status{
-            padding:15px;border-radius:10px;margin:15px 0;font-weight:bold;
-            display:none;
-        }
-        .success{background:#4caf50;color:white;}
-        .error{background:#f44336;color:white;}
-        .info{background:#2196f3;color:white;}
-        .progress{
-            width:100%;height:10px;background:#eee;border-radius:5px;
-            overflow:hidden;margin:20px 0;display:none;
-        }
-        .progress-fill{
-            height:100%;background:linear-gradient(90deg,#ff6b6b,#4ecdc4);
-            width:0%;transition:width 0.3s;
-        }
-        .logs{
-            height:300px;overflow-y:auto;background:#f8f9fa;
-            border-radius:10px;padding:20px;font-family:monospace;
-            font-size:13px;text-align:left;border:1px solid #ddd;
-            margin-top:20px;
-        }
-        .target-show{
-            background:linear-gradient(45deg,#ff6b6b,#4ecdc4);
-            color:white;padding:15px;border-radius:10px;margin:15px 0;
-            font-size:20px;font-weight:bold;display:none;
-        }
-        .stats{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:20px 0;display:none;}
-        .stat{background:#f8f9fa;padding:15px;border-radius:10px;}
-        .stat-num{font-size:24px;color:#ff6b6b;font-weight:bold;}
-    </style>
+    <title>AI Code Generator - Hindi</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <h1>🚀 REAL IG REPORTER</h1>
-        <p style="color:#666;margin-bottom:30px;">GitHub Pages - 100% Working - No Errors</p>
-        
-        <input type="text" id="target" placeholder="Target username (without @)" maxlength="30">
-        <input type="number" id="amount" value="250" min="50" max="1000" placeholder="Number of reports">
-        
-        <div id="targetDisplay" class="target-show"></div>
-        
-        <button onclick="startReporting()">🔥 START MASS REPORT</button>
-        <button onclick="stopReporting()" id="stopBtn" style="background:#f44336;display:none;">⏹️ STOP</button>
-        
-        <div id="statusMsg" class="status info"></div>
-        
-        <div class="progress" id="progressBar">
-            <div class="progress-fill" id="progressFill"></div>
-        </div>
-        
-        <div class="stats" id="reportStats">
-            <div class="stat">
-                <div class="stat-num" id="successNum">0</div>
-                <div>✅ Success</div>
-            </div>
-            <div class="stat">
-                <div class="stat-num" id="totalNum">0</div>
-                <div>📊 Total</div>
+        <header>
+            <h1><i class="fas fa-robot"></i> AI Code Generator</h1>
+            <p>Apna idea type karein, main code likh dunga!</p>
+        </header>
+
+        <div class="chat-container">
+            <div class="messages" id="messages">
+                <div class="message bot-message">
+                    <div class="avatar">🤖</div>
+                    <div class="content">
+                        Namaste! Main aapke liye code likh sakta hu. Kya banana chahte hain? (HTML, CSS, JS, Python, etc.)
+                    </div>
+                </div>
             </div>
         </div>
-        
-        <div class="logs" id="logContainer">Ready to report...</div>
+
+        <div class="input-container">
+            <div class="input-wrapper">
+                <input type="text" id="userInput" placeholder="Yahan apna idea likhein... (jaise: 'ek button jo color change kare')" maxlength="500">
+                <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
     </div>
 
-    <script>
-        let isReporting = false;
-        let reportInterval;
-        let successCount = 0;
-        let totalCount = 0;
-        
-        const reportReasons = [
-            'spam', 'fake_account', 'harassment', 'inappropriate',
-            'scam', 'bullying', 'impersonation', 'nudity', 'violence'
-        ];
-        
-        // WORKING Report Endpoints
-        const endpoints = [
-            'https://httpbin.org/post',
-            'https://jsonplaceholder.typicode.com/posts',
-            'https://api.github.com/repos/octocat/Hello-World',
-            'https://httpstat.us/200',
-            'https://webhook.site/#!/your-id'
-        ];
-        
-        function log(message, type = 'info') {
-            const logs = document.getElementById('logContainer');
-            const timestamp = new Date().toLocaleTimeString();
-            const colors = {
-                success: '#4caf50',
-                error: '#f44336',
-                info: '#2196f3',
-                warning: '#ff9800'
-            };
-            
-            logs.innerHTML += `<div style="color:${colors[type] || '#333'}; margin: 2px 0;">
-                [${timestamp}] ${message}
-            </div>`;
-            logs.scrollTop = logs.scrollHeight;
-        }
-        
-        function updateStatus(message, type = 'info') {
-            const status = document.getElementById('statusMsg');
-            status.textContent = message;
-            status.className = `status ${type}`;
-            status.style.display = 'block';
-        }
-        
-        function updateProgress() {
-            const progress = document.getElementById('progressFill');
-            const percentage = Math.min((totalCount / parseInt(document.getElementById('amount').value || 250)) * 100, 100);
-            progress.style.width = percentage + '%';
-            
-            document.getElementById('successNum').textContent = successCount;
-            document.getElementById('totalNum').textContent = totalCount;
-            document.getElementById('reportStats').style.display = 'grid';
-            document.getElementById('progressBar').style.display = 'block';
-        }
-        
-        async function sendReport(target) {
-            return new Promise((resolve) => {
-                // Simulate real report with high success rate
-                setTimeout(() => {
-                    const success = Math.random() > 0.05; // 95% success rate
-                    resolve(success);
-                }, Math.random() * 800 + 400); // 400-1200ms delay
-            });
-        }
-        
-        async function startReporting() {
-            if (isReporting) return;
-            
-            const target = document.getElementById('target').value.trim();
-            const amount = parseInt(document.getElementById('amount').value) || 250;
-            
-            if (!target) {
-                updateStatus('Enter target username!', 'error');
-                return;
-            }
-            
-            isReporting = true;
-            successCount = 0;
-            totalCount = 0;
-            
-            document.getElementById('targetDisplay').style.display = 'block';
-            document.getElementById('targetDisplay').innerHTML = `🎯 TARGET: <strong>@${target}</strong>`;
-            document.getElementById('stopBtn').style.display = 'block';
-            
-            log(`🚀 Starting ${amount} reports on @${target}`, 'success');
-            updateStatus(`Reporting @${target}... ${amount} reports`, 'success');
-            
-            document.querySelector('button[onclick="startReporting()"]').textContent = '🔄 REPORTING...';
-            
-            // Main reporting loop
-            for (let i = 0; i < amount && isReporting; i++) {
-                const reason = reportReasons[Math.floor(Math.random() * reportReasons.length)];
-                
-                const success = await sendReport(target);
-                if (success) {
-                    successCount++;
-                    log(`✅ Report #${i+1}: ${reason.toUpperCase()} - SUCCESS`, 'success');
-                } else {
-                    log(`⚠️ Report #${i+1}: ${reason} - Failed`, 'warning');
-                }
-                
-                totalCount++;
-                updateProgress();
-                
-                // Human-like delay
-                await new Promise(resolve => setTimeout(resolve, 1200 + Math.random() * 1800));
-            }
-            
-            if (isReporting) {
-                log(`🎉 COMPLETED! ${successCount}/${totalCount} successful reports`, 'success');
-                updateStatus(`✅ FINISHED! ${successCount}/${totalCount} reports sent`, 'success');
-            }
-            
-            stopReporting();
-        }
-        
-        function stopReporting() {
-            isReporting = false;
-            document.getElementById('stopBtn').style.display = 'none';
-            document.querySelector('button[onclick="startReporting()"]').textContent = '🔥 START AGAIN';
-            updateStatus('Stopped!', 'info');
-            log('⏹️ Reporting stopped by user', 'info');
-        }
-        
-        // Enter key support
-        document.getElementById('target').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !isReporting) startReporting();
-        });
-        
-        // Auto focus
-        window.onload = () => document.getElementById('target').focus();
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
