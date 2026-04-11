@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Code Generator - कोड जनरेटर</title>
+    <title>AI Code Generator + Runner - कोड जनरेटर + रनर</title>
     <style>
         * {
             margin: 0;
@@ -15,11 +15,11 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
+            padding: 10px;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
@@ -30,35 +30,57 @@
         .header {
             background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             color: white;
-            padding: 30px;
+            padding: 25px;
             text-align: center;
         }
 
         .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
+            font-size: 2.2em;
+            margin-bottom: 5px;
         }
 
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0;
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-btn.active {
+            background: white;
+            border-bottom-color: #4facfe;
+            color: #4facfe;
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
             min-height: 70vh;
         }
 
-        .input-section {
-            padding: 40px;
-            background: #f8f9fa;
-            border-right: 1px solid #eee;
+        .tab-content.active {
+            display: block;
         }
 
-        .output-section {
-            padding: 40px;
-            background: white;
+        .input-section {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 25px;
         }
 
         .input-group {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         label {
@@ -73,9 +95,10 @@
             padding: 15px;
             border: 2px solid #e1e5e9;
             border-radius: 10px;
-            font-size: 16px;
+            font-size: 14px;
             font-family: inherit;
             transition: all 0.3s ease;
+            resize: vertical;
         }
 
         textarea:focus, select:focus {
@@ -84,83 +107,119 @@
             box-shadow: 0 0 0 3px rgba(79, 172, 254, 0.1);
         }
 
-        .generate-btn {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            color: white;
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .generate-btn, .run-btn, .fix-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 15px;
             border: none;
-            border-radius: 12px;
-            font-size: 18px;
+            border-radius: 10px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
 
-        .generate-btn:hover {
+        .generate-btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .run-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .fix-btn {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            color: #333;
+        }
+
+        .btn-group button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(79, 172, 254, 0.4);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
         }
 
-        .generate-btn:active {
-            transform: translateY(0);
+        .preview-section {
+            border: 2px solid #e1e5e9;
+            border-radius: 15px;
+            height: 500px;
+            overflow: hidden;
+            position: relative;
+            background: white;
+        }
+
+        #preview-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 12px;
+        }
+
+        .code-editor {
+            position: relative;
+            height: 500px;
+            background: #1e1e1e;
+            border-radius: 10px;
+            overflow: hidden;
         }
 
         #output {
             width: 100%;
-            height: 500px;
+            height: 100%;
             background: #1e1e1e;
             color: #d4d4d4;
             border: none;
-            border-radius: 10px;
             padding: 20px;
             font-family: 'Consolas', 'Monaco', monospace;
             font-size: 14px;
             line-height: 1.5;
-            resize: vertical;
-            overflow-y: auto;
-            white-space: pre-wrap;
+            resize: none;
             tab-size: 2;
+            overflow-y: auto;
         }
 
-        .copy-btn {
+        .editor-toolbar {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            padding: 8px 16px;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+            display: flex;
+            gap: 5px;
+        }
+
+        .copy-btn, .download-btn {
+            padding: 8px 12px;
             background: #28a745;
             color: white;
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 14px;
-            opacity: 0.9;
+            font-size: 12px;
         }
 
-        .copy-btn:hover {
-            background: #218838;
+        .download-btn {
+            background: #007bff;
         }
 
-        .output-container {
-            position: relative;
-            height: 500px;
-        }
-
-        @media (max-width: 768px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-            
-            .input-section {
-                border-right: none;
-                border-bottom: 1px solid #eee;
-            }
-            
-            .header h1 {
-                font-size: 2em;
-            }
+        .error-log {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: monospace;
+            font-size: 13px;
+            max-height: 150px;
+            overflow-y: auto;
+            display: none;
         }
 
         .loading {
@@ -168,6 +227,7 @@
             text-align: center;
             color: #666;
             margin-top: 20px;
+            padding: 20px;
         }
 
         .spinner {
@@ -184,93 +244,271 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        @media (max-width: 768px) {
+            .input-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🚀 AI Code Generator</h1>
-            <p>Apna description likho, main code generate kar dunga!</p>
+            <h1>🚀 AI Code Generator + Runner</h1>
+            <p>Code generate karo, run karo, errors fix karwao! 🎯</p>
         </div>
 
-        <div class="main-content">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('generate')">✨ Generate</button>
+            <button class="tab-btn" onclick="showTab('preview')">👁️ Preview</button>
+            <button class="tab-btn" onclick="showTab('debug')">🔧 Debug</button>
+        </div>
+
+        <!-- Generate Tab -->
+        <div id="generate" class="tab-content active">
             <div class="input-section">
-                <div class="input-group">
-                    <label for="description">Kya banana chahte ho? (Description Hindi/English mein)</label>
-                    <textarea id="description" rows="4" placeholder="Example: Ek responsive navbar banao jo mobile mein bhi achha lage. Ya fir Login form with validation..."></textarea>
+                <div>
+                    <div class="input-group">
+                        <label for="description">Kya banana chahte ho?</label>
+                        <textarea id="description" rows="3" placeholder="Example: Responsive navbar with hamburger menu, Login form with validation, Calculator app..."></textarea>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="input-group">
+                            <label for="language">Language</label>
+                            <select id="language">
+                                <option value="html">HTML + CSS + JS</option>
+                                <option value="html-css">HTML + CSS</option>
+                                <option value="javascript">Pure JS</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="complexity">Complexity</label>
+                            <select id="complexity">
+                                <option value="simple">Simple</option>
+                                <option value="medium">Medium</option>
+                                <option value="advanced">Advanced</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="generate-btn" onclick="generateCode()">Generate Code</button>
+                        <button class="fix-btn" onclick="fixCode()">🔧 Fix Errors</button>
+                    </div>
                 </div>
 
-                <div class="input-group">
-                    <label for="language">Programming Language</label>
-                    <select id="language">
-                        <option value="html">HTML + CSS</option>
-                        <option value="javascript">JavaScript</option>
-                        <option value="react">React JS</option>
-                        <option value="bootstrap">Bootstrap</option>
-                        <option value="tailwind">Tailwind CSS</option>
-                    </select>
-                </div>
-
-                <button class="generate-btn" onclick="generateCode()">
-                    ✨ Generate Code
-                </button>
-
-                <div class="loading" id="loading">
-                    <div class="spinner"></div>
-                    <p>AI soch raha hai... Code generate ho raha hai!</p>
+                <div class="code-editor">
+                    <div class="editor-toolbar">
+                        <button class="copy-btn" onclick="copyCode()">📋 Copy</button>
+                        <button class="download-btn" onclick="downloadCode()">💾 Download</button>
+                    </div>
+                    <textarea id="output" readonly>Yahan aapka generated code aayega...</textarea>
                 </div>
             </div>
 
-            <div class="output-section">
-                <div class="output-container">
-                    <button class="copy-btn" onclick="copyCode()" id="copyBtn" style="display: none;">📋 Copy</button>
-                    <code id="output">Yahan aapka generated code aayega...</code>
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>🤖 AI soch raha hai... Code ready ho raha hai!</p>
+            </div>
+        </div>
+
+        <!-- Preview Tab -->
+        <div id="preview" class="tab-content">
+            <div style="display: grid; grid-template-columns: 1fr 350px; gap: 25px; height: 100%;">
+                <div class="preview-section">
+                    <iframe id="preview-iframe" srcdoc="<h2>Code run karne ke liye Generate tab se code generate karo! 🚀</h2>"></iframe>
+                </div>
+                <div>
+                    <div class="btn-group">
+                        <button class="run-btn" onclick="runCode()">▶️ Run Code</button>
+                        <button class="generate-btn" onclick="showTab('generate')">Generate</button>
+                    </div>
+                    <div class="error-log" id="errorLog"></div>
                 </div>
             </div>
+        </div>
+
+        <!-- Debug Tab -->
+        <div id="debug" class="tab-content">
+            <h3>🔍 Error Debug & Fix</h3>
+            <p>Run karne pe jo errors aaye hain, wo yahan dikhega. Fix button dabao!</p>
+            <div id="debugInfo" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                Pehle code generate aur run karo!
+            </div>
+        </div>
+    </div>
+</script>
+
+<script>
+    let currentCode = '';
+    let errorMessages = [];
+
+    function showTab(tabName) {
+        // Hide all tabs
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        
+        // Show selected tab
+        document.getElementById(tabName).classList.add('active');
+        event.target.classList.add('active');
+    }
+
+    function generateCode() {
+        const description = document.getElementById('description').value.trim();
+        const language = document.getElementById('language').value;
+        
+        if (!description) {
+            alert('Description likho pehle! 😊');
+            return;
+        }
+
+        document.getElementById('loading').style.display = 'block';
+        
+        setTimeout(() => {
+            currentCode = generateAIResponse(description, language);
+            document.getElementById('output').value = currentCode;
+            document.getElementById('loading').style.display = 'none';
+        }, 2000);
+    }
+
+    function generateAIResponse(description, language) {
+        // Advanced AI logic with more templates
+        description = description.toLowerCase();
+        
+        if (description.includes('calculator')) {
+            return `<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .calculator {
+            max-width: 300px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(145deg, #667eea, #764ba2);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        input[type="text"] {
+            width: 100%;
+            height: 60px;
+            font-size: 24px;
+            text-align: right;
+            padding: 0 15px;
+            border: none;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            background: rgba(255,255,255,0.9);
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        button {
+            height: 60px;
+            border: none;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        button:hover { transform: scale(1.05); }
+        .operator { background: #ff9500; color: white; }
+        .equals { background: #00f2fe; color: white; }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" id="result" readonly>
+        <div class="buttons">
+            <button onclick="clear()">C</button>
+            <button onclick="backspace()">⌫</button>
+            <button class="operator" onclick="appendToDisplay('/')">/</button>
+            <button class="operator" onclick="appendToDisplay('*')">×</button>
+            
+            <button onclick="appendToDisplay('7')">7</button>
+            <button onclick="appendToDisplay('8')">8</button>
+            <button onclick="appendToDisplay('9')">9</button>
+            <button class="operator" onclick="appendToDisplay('-')">-</button>
+            
+            <button onclick="appendToDisplay('4')">4</button>
+            <button onclick="appendToDisplay('5')">5</button>
+            <button onclick="appendToDisplay('6')">6</button>
+            <button class="operator" onclick="appendToDisplay('+')">+</button>
+            
+            <button onclick="appendToDisplay('1')">1</button>
+            <button onclick="appendToDisplay('2')">2</button>
+            <button onclick="appendToDisplay('3')">3</button>
+            <button class="equals" onclick="calculate()" rowspan="2">=</button>
+            
+            <button onclick="appendToDisplay('0')" style="grid-column: span 2;" >0</button>
+            <button onclick="appendToDisplay('.')">.</button>
         </div>
     </div>
 
     <script>
-        function generateCode() {
-            const description = document.getElementById('description').value.trim();
-            const language = document.getElementById('language').value;
-            
-            if (!description) {
-                alert('Pehle description likho! 😊');
-                return;
-            }
-
-            // Loading show karo
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('copyBtn').style.display = 'none';
-            
-            // Simulate AI thinking (2-4 seconds)
-            setTimeout(() => {
-                const code = generateAIResponse(description, language);
-                document.getElementById('output').textContent = code;
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('copyBtn').style.display = 'block';
-            }, Math.random() * 2000 + 2000);
+        let display = document.getElementById('result');
+        let currentInput = '';
+        
+        function appendToDisplay(value) {
+            currentInput += value;
+            display.value = currentInput;
         }
-
-        function generateAIResponse(description, language) {
-            description = description.toLowerCase();
-            
-            // Simple rule-based AI code generator
-            let code = '';
-            
-            if (language === 'html') {
-                if (description.includes('navbar') || description.includes('menu')) {
-                    code = `<!DOCTYPE html>
+        
+        function clear() {
+            currentInput = '';
+            display.value = '';
+        }
+        
+        function backspace() {
+            currentInput = currentInput.slice(0, -1);
+            display.value = currentInput;
+        }
+        
+        function calculate() {
+            try {
+                let result = eval(currentInput.replace('×', '*'));
+                display.value = result;
+                currentInput = result.toString();
+            } catch {
+                display.value = 'Error';
+                currentInput = '';
+            }
+        }
+    </script>
+</body>
+</html>`;
+        }
+        
+        // Navbar example
+        if (description.includes('navbar') || description.includes('menu')) {
+            return `<!DOCTYPE html>
 <html>
 <head>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; }
+        
         nav {
-            background: linear-gradient(45deg, #667eea, #764ba2);
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
             padding: 1rem 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
         }
+        
         .nav-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -279,230 +517,56 @@
             align-items: center;
             padding: 0 2rem;
         }
+        
         .logo {
             color: white;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: bold;
+            text-decoration: none;
         }
+        
         .nav-links {
             display: flex;
             list-style: none;
             gap: 2rem;
         }
+        
         .nav-links a {
             color: white;
             text-decoration: none;
             padding: 0.5rem 1rem;
             border-radius: 25px;
             transition: all 0.3s;
+            font-weight: 500;
         }
+        
         .nav-links a:hover {
             background: rgba(255,255,255,0.2);
             transform: translateY(-2px);
         }
+        
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 4px;
+        }
+        
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: white;
+            transition: 0.3s;
+        }
+        
         @media (max-width: 768px) {
-            .nav-links { display: none; }
-        }
-    </style>
-</head>
-<body>
-    <nav>
-        <div class="nav-container">
-            <div class="logo">Logo</div>
-            <ul class="nav-links">
-                <li><a href="#">Home</a></li>
-                <li><a href="#">About</a></li>
-                <li><a href="#">Services</a></li>
-                <li><a href="#">Contact</a></li>
-            </ul>
-        </div>
-    </nav>
-</body>
-</html>`;
-                } 
-                else if (description.includes('login') || description.includes('form')) {
-                    code = `<!DOCTYPE html>
-<html>
-<head>
-    <style>
-        .login-form {
-            max-width: 400px;
-            margin: 100px auto;
-            padding: 2rem;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-        }
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        label { display: block; margin-bottom: 0.5rem; font-weight: 600; }
-        input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e1e5e9;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: border-color 0.3s;
-        }
-        input:focus { 
-            outline: none; 
-            border-color: #4facfe; 
-        }
-        .login-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(45deg, #4facfe, #00f2fe);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(79,172,254,0.4);
-        }
-    </style>
-</head>
-<body>
-    <div class="login-form">
-        <h2 style="text-align: center; margin-bottom: 2rem;">Login</h2>
-        <form>
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" placeholder="your@email.com" required>
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" placeholder="••••••••" required>
-            </div>
-            <button type="submit" class="login-btn">Login</button>
-        </form>
-    </div>
-</body>
-</html>`;
-                }
-                else {
-                    code = `/* AI ne ye beautiful card banaya hai! */\n\n<!DOCTYPE html>
-<html>
-<head>
-    <style>
-        .card {
-            max-width: 350px;
-            margin: 50px auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
-            transition: transform 0.3s;
-        }
-        .card:hover {
-            transform: translateY(-10px);
-        }
-        .card-img {
-            height: 200px;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-        }
-        .card-content {
-            padding: 2rem;
-        }
-        .card h3 {
-            color: #333;
-            margin-bottom: 1rem;
-        }
-        .card p {
-            color: #666;
-            line-height: 1.6;
-        }
-    </style>
-</head>
-<body>
-    <div class="card">
-        <div class="card-img"></div>
-        <div class="card-content">
-            <h3>Beautiful Card</h3>
-            <p>Ye ek responsive card hai jo AI ne banaya hai. Hover karo to upar uth jayega!</p>
-        </div>
-    </div>
-</body>
-</html>`;
-                }
-            }
-            
-            else if (language === 'javascript') {
-                code = `// AI Generated JavaScript Code
-// Description: ${description}
-
-class AICodeGenerator {
-    constructor() {
-        this.init();
-    }
-    
-    init() {
-        console.log('🤖 AI Code Generator Ready!');
-        
-        // Example functionality
-        document.addEventListener('DOMContentLoaded', () => {
-            this.createMagicButton();
-        });
-    }
-    
-    createMagicButton() {
-        const button = document.createElement('button');
-        button.innerHTML = '✨ Magic!';
-        button.style.cssText = \`
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            border: none;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            transition: all 0.3s;
-        \`;
-        
-        button.onclick = () => {
-            alert('🎉 Magic ho gaya!');
-        };
-        
-        document.body.appendChild(button);
-    }
-}
-
-// Initialize
-new AICodeGenerator();`;
-            }
-            
-            // Aur languages ke liye bhi similar logic...
-            
-            return code;
-        }
-
-        function copyCode() {
-            const output = document.getElementById('output');
-            navigator.clipboard.writeText(output.textContent).then(() => {
-                const btn = document.getElementById('copyBtn');
-                const originalText = btn.innerHTML;
-                btn.innerHTML = '✅ Copied!';
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                }, 2000);
-            });
-        }
-
-        // Enter key se bhi generate ho jaye
-        document.getElementById('description').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && e.ctrlKey) {
-                generateCode();
-            }
-        });
-    </script>
-</body>
-</html>
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                height: calc(100vh - 70px);
+                background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+                flex-direction: column;
+                justify-content: center;
+                transform: translateX
