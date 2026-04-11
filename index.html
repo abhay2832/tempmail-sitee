@@ -3,36 +3,260 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Code Generator - Hindi</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>AI Code Generator + Runner 🔥</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;padding:10px}
+        .container{max-width:1400px;margin:0 auto;background:white;border-radius:20px;box-shadow:0 20px 40px rgba(0,0,0,.1);overflow:hidden}
+        .header{background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);color:white;padding:25px;text-align:center}
+        .header h1{font-size:2em;margin-bottom:5px}
+        .tabs{display:flex;background:#f8f9fa;border-bottom:1px solid #eee}
+        .tab-btn{flex:1;padding:15px;background:none;border:none;font-size:16px;cursor:pointer;transition:all .3s;border-bottom:3px solid transparent}
+        .tab-btn.active{background:white;border-bottom-color:#4facfe;color:#4facfe;font-weight:600}
+        .tab-content{display:none;padding:30px;min-height:70vh}
+        .tab-content.active{display:block}
+        .input-section{display:grid;grid-template-columns:1fr 350px;gap:25px}
+        .input-group{margin-bottom:20px}
+        label{display:block;margin-bottom:8px;font-weight:600;color:#333}
+        textarea,select{width:100%;padding:15px;border:2px solid #e1e5e9;border-radius:10px;font-size:14px;font-family:inherit;transition:all .3s;resize:vertical}
+        textarea:focus,select:focus{outline:none;border-color:#4facfe;box-shadow:0 0 0 3px rgba(79,172,254,.1)}
+        .btn-group{display:flex;gap:10px;flex-wrap:wrap}
+        .generate-btn,.run-btn,.fix-btn{flex:1;min-width:120px;padding:15px;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;transition:all .3s;text-transform:uppercase;letter-spacing:.5px}
+        .generate-btn{background:linear-gradient(135deg,#4facfe 0%,#00f2fe 100%);color:white}
+        .run-btn{background:linear-gradient(135deg,#28a745 0%,#20c997 100%);color:white}
+        .fix-btn{background:linear-gradient(135deg,#ffc107 0%,#fd7e14 100%);color:#333}
+        button:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,.2)}
+        .preview-section{border:2px solid #e1e5e9;border-radius:15px;height:500px;overflow:hidden;background:white}
+        #preview-iframe{width:100%;height:100%;border:none;border-radius:12px}
+        .code-editor{position:relative;height:500px;background:#1e1e1e;border-radius:10px;overflow:hidden}
+        #output{width:100%;height:100%;background:#1e1e1e;color:#d4d4d4;border:none;padding:20px;font-family:'Consolas','Monaco',monospace;font-size:14px;line-height:1.5;resize:none;overflow-y:auto;tab-size:2}
+        .editor-toolbar{position:absolute;top:10px;right:10px;z-index:10;display:flex;gap:5px}
+        .copy-btn,.download-btn{padding:8px 12px;background:#28a745;color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px}
+        .download-btn{background:#007bff}
+        .error-log{background:#f8d7da;border:1px solid #f5c6cb;border-radius:8px;padding:15px;margin-top:15px;font-family:monospace;font-size:13px;max-height:150px;overflow-y:auto;display:none}
+        .loading{display:none;text-align:center;color:#666;margin-top:20px;padding:20px}
+        .spinner{border:3px solid #f3f3f3;border-top:3px solid #4facfe;border-radius:50%;width:30px;height:30px;animation:spin 1s linear infinite;margin:0 auto 10px}
+        @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+        @media(max-width:768px){.input-section{grid-template-columns:1fr}.tabs{flex-direction:column}}
+    </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1><i class="fas fa-robot"></i> AI Code Generator</h1>
-            <p>Apna idea type karein, main code likh dunga!</p>
-        </header>
+        <div class="header">
+            <h1>🚀 AI Code Generator + Runner</h1>
+            <p>Generate → Run → Fix! सब एक जगह 🔥</p>
+        </div>
 
-        <div class="chat-container">
-            <div class="messages" id="messages">
-                <div class="message bot-message">
-                    <div class="avatar">🤖</div>
-                    <div class="content">
-                        Namaste! Main aapke liye code likh sakta hu. Kya banana chahte hain? (HTML, CSS, JS, Python, etc.)
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('generate')">✨ Generate</button>
+            <button class="tab-btn" onclick="showTab('preview')">▶️ Run</button>
+            <button class="tab-btn" onclick="showTab('debug')">🔧 Fix</button>
+        </div>
+
+        <div id="generate" class="tab-content active">
+            <div class="input-section">
+                <div>
+                    <div class="input-group">
+                        <label>क्या बनाना है?</label>
+                        <textarea id="description" rows="4" placeholder="calculator, navbar, login form, todo list, card design..."></textarea>
                     </div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px">
+                        <div class="input-group">
+                            <label>Language</label>
+                            <select id="language">
+                                <option value="html">HTML+CSS+JS</option>
+                                <option value="html-css">HTML+CSS</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label>Level</label>
+                            <select id="complexity">
+                                <option value="simple">Simple</option>
+                                <option value="medium">Medium</option>
+                                <option value="pro">Pro</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="generate-btn" onclick="generateCode()">Generate</button>
+                        <button class="run-btn" onclick="runCode()">▶️ Run</button>
+                        <button class="fix-btn" onclick="fixCode()">🔧 Fix</button>
+                    </div>
+                </div>
+                <div class="code-editor">
+                    <div class="editor-toolbar">
+                        <button class="copy-btn" onclick="copyCode()">Copy</button>
+                        <button class="download-btn" onclick="downloadCode()">Download</button>
+                    </div>
+                    <textarea id="output">यहाँ code आएगा...</textarea>
+                </div>
+            </div>
+            <div class="loading" id="loading">
+                <div class="spinner"></div><p>AI सोच रहा है...</p>
+            </div>
+        </div>
+
+        <div id="preview" class="tab-content">
+            <div style="display:grid;grid-template-columns:1fr 300px;gap:25px;height:100%">
+                <div class="preview-section">
+                    <iframe id="preview-iframe"></iframe>
+                </div>
+                <div>
+                    <div class="btn-group">
+                        <button class="run-btn" onclick="runCode()" style="width:100%">▶️ Run Code</button>
+                        <button class="generate-btn" onclick="showTab('generate')" style="width:100%;margin-top:10px">← Generate</button>
+                    </div>
+                    <div class="error-log" id="errorLog">यहाँ errors दिखेंगे</div>
                 </div>
             </div>
         </div>
 
-        <div class="input-container">
-            <div class="input-wrapper">
-                <input type="text" id="userInput" placeholder="Yahan apna idea likhein... (jaise: 'ek button jo color change kare')" maxlength="500">
-                <button id="sendBtn"><i class="fas fa-paper-plane"></i></button>
+        <div id="debug" class="tab-content">
+            <h3>🔍 Debug Info</h3>
+            <div id="debugInfo" style="padding:20px;background:#f8f9fa;border-radius:10px;margin-top:20px">
+                पहले Generate → Run करो! Errors यहाँ दिखेंगे
+            </div>
+            <div class="btn-group" style="margin-top:20px">
+                <button class="fix-btn" onclick="autoFix()" style="width:100%">🤖 Auto Fix Errors</button>
             </div>
         </div>
     </div>
 
-    <script src="script.js"></script>
-</body>
-</html>
+    <script>
+        let currentCode = '';
+        let iframe = document.getElementById('preview-iframe');
+        
+        function showTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(t=>t.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function generateCode() {
+            const desc = document.getElementById('description').value.toLowerCase();
+            document.getElementById('loading').style.display = 'block';
+            
+            setTimeout(() => {
+                currentCode = getCodeTemplate(desc);
+                document.getElementById('output').value = currentCode;
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('debugInfo').innerHTML = 'Code generate हो गया! अब Run करो ✅';
+            }, 1500);
+        }
+
+        function getCodeTemplate(desc) {
+            if (desc.includes('calculator') || desc.includes('calc')) {
+                return `<!DOCTYPE html>
+<html><head><style>
+.calculator{max-width:320px;margin:50px auto;padding:25px;background:linear-gradient(145deg,#667eea,#764ba2);border-radius:25px;box-shadow:0 25px 50px rgba(0,0,0,.3)}
+#display{width:100%;height:70px;font-size:28px;text-align:right;padding:0 20px;border:none;border-radius:15px;margin-bottom:20px;background:rgba(255,255,255,.95);box-shadow:inset 0 5px 10px rgba(0,0,0,.1)}
+.btns{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}
+button{height:70px;border:none;border-radius:15px;font-size:22px;font-weight:bold;cursor:pointer;transition:all .2s;box-shadow:0 5px 15px rgba(0,0,0,.2)}
+button:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(0,0,0,.3)}
+.num{background:#f0f0f0;color:#333}
+.op{background:#ff9500;color:white}
+.eq{background:#00f2fe;color:white;font-size:26px}
+</style></head><body>
+<div class="calculator">
+<input type="text" id="display" readonly>
+<div class="btns">
+<button class="op" onclick="clearAll()">C</button><button onclick="del()">⌫</button><button class="op" onclick="input('/')">/</button><button class="op" onclick="input('*')">×</button>
+<button class="num" onclick="input('7')">7</button><button class="num" onclick="input('8')">8</button><button class="num" onclick="input('9')">9</button><button class="op" onclick="input('-")">-</button>
+<button class="num" onclick="input('4')">4</button><button class="num" onclick="input('5')">5</button><button class="num" onclick="input('6')">6</button><button class="op" onclick="input('+')">+</button>
+<button class="num" onclick="input('1')">1</button><button class="num" onclick="input('2')">2</button><button class="num" onclick="input('3')">3</button><button class="eq" onclick="calculate()" rowspan=2>=</button>
+<button class="num" onclick="input('0')" style="grid-column:span 2">0</button><button onclick="input('.')">.</button>
+</div></div>
+<script>
+let display=document.getElementById('display'),current='';
+function input(v){current+=v;display.value=current}
+function clearAll(){current='';display.value=''}
+function del(){current=current.slice(0,-1);display.value=current}
+function calculate(){try{display.value=eval(current.replace('×','*'));current=display.value}catch{display.value='Error';current=''}}
+</script></body></html>`;
+            }
+            
+            if (desc.includes('navbar') || desc.includes('menu')) {
+                return `<!DOCTYPE html>
+<html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);min-height:100vh}
+nav{background:linear-gradient(90deg,#667eea 0%,#764ba2 100%);padding:1.2rem 0;position:sticky;top:0;z-index:100;box-shadow:0 4px 25px rgba(0,0,0,.15)}
+.nav-container{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:0 2rem}
+.logo{color:white;font-size:1.8rem;font-weight:bold;text-decoration:none}
+.nav-links{display:flex;list-style:none;gap:2rem}
+.nav-links a{color:white;text-decoration:none;padding:12px 24px;border-radius:30px;transition:all .3s;font-weight:500}
+.nav-links a:hover{background:rgba(255,255,255,.2);transform:translateY(-3px)}
+.hamburger{display:none;flex-direction:column;cursor:pointer;gap:5px}
+.hamburger span{width:28px;height:3px;background:white;border-radius:3px;transition:.3s}
+.mobile-menu{display:none;position:fixed;top:80px;left:0;width:100%;height:calc(100vh-80px);background:linear-gradient(180deg,#667eea 0%,#764ba2 100%);flex-direction:column;justify-content:center;align-items:center;gap:2rem;transform:translateX(100%);transition:all .4s}
+.mobile-menu.active{transform:translateX(0);display:flex}
+@media(max-width:768px){.nav-links{display:none}.hamburger{display:flex}.logo{font-size:1.5rem}}
+</style></head><body>
+<nav>
+<div class="nav-container">
+<a href="#" class="logo">Logo</a>
+<ul class="nav-links">
+<li><a href="#">Home</a></li><li><a href="#">About</a></li><li><a href="#">Services</a></li><li><a href="#">Contact</a></li>
+</ul>
+<div class="hamburger" onclick="toggleMenu()">
+<span></span><span></span><span></span>
+</div>
+</div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+<a href="#" style="color:white;font-size:1.5rem;padding:15px 25px;border-radius:25px;transition:all .3s">Home</a>
+<a href="#" style="color:white;font-size:1.5rem;padding:15px 25px;border-radius:25px;transition:all .3s">About</a>
+<a href="#" style="color:white;font-size:1.5rem;padding:15px 25px;border-radius:25px;transition:all .3s">Services</a>
+<a href="#" style="color:white;font-size:1.5rem;padding:15px 25px;border-radius:25px;transition:all .3s">Contact</a>
+</div>
+
+<div style="padding:100px 20px;text-align:center">
+<h1>Responsive Navbar Demo</h1>
+<p>Desktop और Mobile दोनों में काम करेगा! 📱💻</p>
+</div>
+
+<script>
+function toggleMenu(){document.getElementById('mobileMenu').classList.toggle('active')}
+</script></body></html>`;
+            }
+            
+            if (desc.includes('login') || desc.includes('form')) {
+                return `<!DOCTYPE html>
+<html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:linear-gradient(-45deg,#ee7752,#e73c7e,#23a6d5,#23d5ab);min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:'Segoe UI',sans-serif}
+.login-card{max-width:420px;width:100%;padding:40px;background:white;border-radius:25px;box-shadow:0 30px 60px rgba(0,0,0,.3);text-align:center}
+.logo{margin-bottom:30px;font-size:2.5rem;font-weight:bold;background:linear-gradient(45deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.form-group{margin-bottom:25px}
+label{display:block;margin-bottom:10px;font-weight:600;color:#333}
+input{width:100%;padding:18px;border:2px solid #e1e5e9;border-radius:15px;font-size:16px;transition:all .3s}
+input:focus{outline:none;border-color:#4facfe;box-shadow:0 0 0 4px rgba(79,172,254,.1);transform:translateY(-2px)}
+.login-btn{width:100%;padding:18px;background:linear-gradient(45deg,#4facfe,#00f2fe);color:white;border:none;border-radius:15px;font-size:18px;font-weight:600;cursor:pointer;transition:all .3s;text-transform:uppercase;letter-spacing:1px}
+.login-btn:hover{transform:translateY(-3px);box-shadow:0 15px 35px rgba(79,172,254,.4)}
+.forgot{margin-top:20px}
+.forgot a{color:#666;text-decoration:none;font-size:14px;transition:color .3s}
+.forgot a:hover{color:#4facfe}
+</style></head><body>
+<div class="login-card">
+<div class="logo">🔐 Login</div>
+<form>
+<div class="form-group">
+<label>Email</label>
+<input type="email" placeholder="your@email.com" required>
+</div>
+<div class="form-group">
+<label>Password</label>
+<input type="password" placeholder="••••••••••" required>
+</div>
+<button type="submit" class="login-btn">Login Now</button>
+</form>
+<div class="forgot"><a href="#">Forgot Password?</a></div>
+</div>
+<script>
+document.querySelector('form').onsubmit=function(e){
+e.preventDefault();
+alert('✅ Login Successful! (Demo)');
+}
+</script>
+</body></html
