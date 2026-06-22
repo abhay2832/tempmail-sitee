@@ -3,16 +3,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Temp Mail Pro</title><style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
-}
-
 body {
+  margin: 0;
+  font-family: Arial;
   background: #0f172a;
-  color: #fff;
+  color: white;
 }
 
 header {
@@ -54,7 +49,6 @@ button {
   background: #22c55e;
   font-size: 16px;
   cursor: pointer;
-  transition: 0.3s;
 }
 
 button:hover {
@@ -69,81 +63,77 @@ button:hover {
   font-size: 14px;
 }
 
-.footer {
-  text-align: center;
-  font-size: 12px;
-  opacity: 0.6;
-  margin-top: 20px;
-}
-</style></head><body><header>📧 Temp Mail Pro</header><div class="container">  <div class="box">
-    <input type="text" id="email" placeholder="Click Generate Email" readonly>
-    <button onclick="generateEmail()">Generate Email</button>
-    <button onclick="copyEmail()">Copy Email</button>
-  </div>  <div class="box">
-    <h3>Inbox</h3>
-    <div id="inbox">
-      <p>No messages yet...</p>
-    </div>
-    <button onclick="refreshInbox()">Refresh Inbox</button>
-  </div>  <div class="footer">
-    Simple Temp Mail Demo • GitHub Ready
-  </div></div><script>
+</style></head><body><header>📧 Temp Mail Pro</header><div class="container"><div class="box">
+<input type="text" id="email" placeholder="Generate email" readonly>
+<button onclick="generateEmail()">Generate Email</button>
+<button onclick="copyEmail()">Copy Email</button>
+</div><div class="box">
+<h3>Inbox</h3>
+<div id="inbox"><p>No messages yet...</p></div>
+<button onclick="refreshInbox()">Refresh Inbox</button>
+</div></div><script>
 let currentEmail = "";
-let inboxMessages = [];
+let inbox = [];
+
+// realistic names
+const firstNames = ["rahul","aman","rohit","vikas","manav","arjun","deepak","karan"];
+const lastNames = ["sharma","verma","singh","yadav","kumar","gupta","rajput"];
+const domains = ["mailboxpro.net","inboxhub.net","fastmailbox.org","securemailhub.net"];
 
 function generateEmail() {
-  const random = Math.random().toString(36).substring(2, 10);
-  const domains = ["tempmail.xyz", "mailboxy.site", "quickmail.pro"];
-  const domain = domains[Math.floor(Math.random() * domains.length)];
+  let first = firstNames[Math.floor(Math.random()*firstNames.length)];
+  let last = lastNames[Math.floor(Math.random()*lastNames.length)];
+  let number = Math.floor(Math.random()*9999);
 
-  currentEmail = random + "@" + domain;
+  let domain = domains[Math.floor(Math.random()*domains.length)];
+
+  currentEmail = first + "." + last + number + "@" + domain;
+
   document.getElementById("email").value = currentEmail;
 
-  inboxMessages = [];
+  inbox = [];
   updateInbox();
 }
 
 function copyEmail() {
-  const emailField = document.getElementById("email");
-  emailField.select();
-  emailField.setSelectionRange(0, 99999);
+  let input = document.getElementById("email");
+  input.select();
   document.execCommand("copy");
-  alert("Email copied!");
+  alert("Copied!");
 }
 
 function updateInbox() {
-  const inbox = document.getElementById("inbox");
+  let box = document.getElementById("inbox");
 
-  if (inboxMessages.length === 0) {
-    inbox.innerHTML = "<p>No messages yet...</p>";
+  if (inbox.length === 0) {
+    box.innerHTML = "<p>No messages yet...</p>";
     return;
   }
 
-  inbox.innerHTML = inboxMessages.map(msg => `
+  box.innerHTML = inbox.map(msg => `
     <div class="inbox-item">
-      <b>${msg.title}</b><br>
-      ${msg.body}
+      <b>${msg.title}</b><br>${msg.body}
     </div>
   `).join("");
 }
 
 function refreshInbox() {
   if (!currentEmail) {
-    alert("Please generate email first!");
+    alert("Generate email first!");
     return;
   }
 
-  const demoMessages = [
-    {title: "OTP Code", body: "Your OTP is: " + Math.floor(100000 + Math.random()*900000)},
-    {title: "Welcome", body: "Thanks for signing up!"},
-    {title: "Security Alert", body: "New login detected."},
-    {title: "Verification", body: "Click link to verify account."}
+  let msgs = [
+    {title:"OTP", body:"Your OTP is " + Math.floor(100000 + Math.random()*900000)},
+    {title:"Welcome", body:"Welcome to our platform"},
+    {title:"Security Alert", body:"New login detected"},
+    {title:"Verification", body:"Verify your email now"}
   ];
 
-  const randomMsg = demoMessages[Math.floor(Math.random() * demoMessages.length)];
-  inboxMessages.unshift(randomMsg);
+  let msg = msgs[Math.floor(Math.random()*msgs.length)];
 
+  inbox.unshift(msg);
   updateInbox();
 }
 </script></body>
-</html>bodyDiv.innerText
+</html>
