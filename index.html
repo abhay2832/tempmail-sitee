@@ -2,25 +2,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Temp Mail Pro</title><style>
+<title>Real Temp Mail</title><style>
 body {
-  margin: 0;
   font-family: Arial;
   background: #0f172a;
   color: white;
-}
-
-header {
   text-align: center;
-  padding: 15px;
-  background: #1e293b;
-  font-size: 22px;
-  font-weight: bold;
-}
-
-.container {
-  max-width: 500px;
-  margin: auto;
   padding: 20px;
 }
 
@@ -28,112 +15,107 @@ header {
   background: #1e293b;
   padding: 15px;
   border-radius: 10px;
-  margin-bottom: 20px;
+  margin: 15px auto;
+  max-width: 400px;
 }
 
-input {
+input, button {
   width: 100%;
-  padding: 12px;
-  border-radius: 6px;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 5px;
   border: none;
-  text-align: center;
-  font-size: 16px;
 }
 
 button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  border: none;
-  border-radius: 6px;
   background: #22c55e;
-  font-size: 16px;
   cursor: pointer;
 }
 
-button:hover {
-  background: #16a34a;
-}
-
-.inbox-item {
+.mail {
   background: #334155;
-  padding: 10px;
-  border-radius: 6px;
   margin-top: 10px;
-  font-size: 14px;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: left;
+}
+</style></head><body><h2>📧 Real Temp Mail</h2><div class="box">
+<input type="text" id="email" readonly placeholder="Click create">
+<button onclick="createEmail()">Create Email</button>
+<button onclick="loadInbox()">Refresh Inbox</button>
+</div><div class="box" id="inbox">
+No mails yet...
+</div><script>
+let token = "";
+let address = "";
+
+async function createEmail() {
+  // get domain
+  let res = await fetch("https://api.mail.tm/domains");
+  let data = await res.json();
+  let domain = data["hydra:member"][0].domain;
+
+  // create account
+  let random = Math.random().toString(36).substring(2,10);
+  address = random + "@" + domain;
+
+  await fetch("https://api.mail.tm/accounts", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      address: address,
+      password: "12345678"
+    })
+  });
+
+  // login
+  let login = await fetch("https://api.mail.tm/token", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      address: address,
+      password: "12345678"
+    })
+  });
+
+  let loginData = await login.json();
+  token = loginData.token;
+
+  document.getElementById("email").value = address;
+  document.getElementById("inbox").innerHTML = "Email created. Wait for OTP...";
 }
 
-</style></head><body><header>📧 Temp Mail Pro</header><div class="container"><div class="box">
-<input type="text" id="email" placeholder="Generate email" readonly>
-<button onclick="generateEmail()">Generate Email</button>
-<button onclick="copyEmail()">Copy Email</button>
-</div><div class="box">
-<h3>Inbox</h3>
-<div id="inbox"><p>No messages yet...</p></div>
-<button onclick="refreshInbox()">Refresh Inbox</button>
-</div></div><script>
-let currentEmail = "";
-let inbox = [];
-
-// realistic names
-const firstNames = ["rahul","aman","rohit","vikas","manav","arjun","deepak","karan"];
-const lastNames = ["sharma","verma","singh","yadav","kumar","gupta","rajput"];
-const domains = ["mailboxpro.net","inboxhub.net","fastmailbox.org","securemailhub.net"];
-
-function generateEmail() {
-  let first = firstNames[Math.floor(Math.random()*firstNames.length)];
-  let last = lastNames[Math.floor(Math.random()*lastNames.length)];
-  let number = Math.floor(Math.random()*9999);
-
-  let domain = domains[Math.floor(Math.random()*domains.length)];
-
-  currentEmail = first + "." + last + number + "@" + domain;
-
-  document.getElementById("email").value = currentEmail;
-
-  inbox = [];
-  updateInbox();
-}
-
-function copyEmail() {
-  let input = document.getElementById("email");
-  input.select();
-  document.execCommand("copy");
-  alert("Copied!");
-}
-
-function updateInbox() {
-  let box = document.getElementById("inbox");
-
-  if (inbox.length === 0) {
-    box.innerHTML = "<p>No messages yet...</p>";
+async function loadInbox() {
+  if (!token) {
+    alert("Create email first!");
     return;
   }
 
-  box.innerHTML = inbox.map(msg => `
-    <div class="inbox-item">
-      <b>${msg.title}</b><br>${msg.body}
-    </div>
-  `).join("");
-}
+  let res = await fetch("https://api.mail.tm/messages", {
+    headers: {
+      "Authorization": "Bearer " + token
+    }
+  });
 
-function refreshInbox() {
-  if (!currentEmail) {
-    alert("Generate email first!");
+  let data = await res.json();
+
+  if (data["hydra:member"].length === 0) {
+    document.getElementById("inbox").innerHTML = "No messages yet...";
     return;
   }
 
-  let msgs = [
-    {title:"OTP", body:"Your OTP is " + Math.floor(100000 + Math.random()*900000)},
-    {title:"Welcome", body:"Welcome to our platform"},
-    {title:"Security Alert", body:"New login detected"},
-    {title:"Verification", body:"Verify your email now"}
-  ];
+  let html = "";
 
-  let msg = msgs[Math.floor(Math.random()*msgs.length)];
+  for (let msg of data["hydra:member"]) {
+    html += `
+      <div class="mail">
+        <b>${msg.subject}</b><br>
+        From: ${msg.from.address}
+      </div>
+    `;
+  }
 
-  inbox.unshift(msg);
-  updateInbox();
+  document.getElementById("inbox").innerHTML = html;
 }
 </script></body>
 </html>
