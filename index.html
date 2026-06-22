@@ -1,202 +1,149 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro Temp Mail</title>
-    <style>
-        :root {
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --success: #10b981;
-            --success-hover: #059669;
-            --warning: #f59e0b;
-            --warning-hover: #d97706;
-            --bg: #f3f4f6;
-            --card-bg: #ffffff;
-            --text-main: #1f2937;
-            --text-muted: #6b7280;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
-        body { background-color: var(--bg); color: var(--text-main); display: flex; flex-direction: column; align-items: center; padding: 2rem 1rem; min-height: 100vh; }
-        .container { background: var(--card-bg); width: 100%; max-width: 600px; padding: 2rem; border-radius: 1rem; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; }
-        h1 { font-size: 1.8rem; margin-bottom: 0.5rem; color: var(--primary); }
-        p.desc { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; }
-        
-        /* Email Box */
-        .email-display { background: #e0e7ff; border: 2px dashed #a5b4fc; border-radius: 0.75rem; padding: 1.25rem; font-size: 1.2rem; font-weight: 700; color: var(--primary); margin-bottom: 1.5rem; word-break: break-all; transition: all 0.3s; }
-        
-        /* Buttons */
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 2rem; }
-        button { border: none; padding: 0.75rem 1rem; border-radius: 0.5rem; font-size: 0.95rem; font-weight: 600; color: white; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
-        button:active { transform: scale(0.98); }
-        .btn-new { background: var(--success); } .btn-new:hover { background: var(--success-hover); }
-        .btn-copy { background: var(--primary); } .btn-copy:hover { background: var(--primary-hover); }
-        .btn-refresh { background: var(--warning); grid-column: span 2; } .btn-refresh:hover { background: var(--warning-hover); }
-        
-        /* Inbox */
-        .inbox-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 2px solid var(--bg); padding-bottom: 0.5rem; }
-        .inbox-header h2 { font-size: 1.2rem; color: var(--text-main); }
-        .loader { font-size: 0.85rem; color: var(--text-muted); display: none; }
-        
-        .mail-list { display: flex; flex-direction: column; gap: 1rem; text-align: left; }
-        .mail-item { background: var(--bg); border-radius: 0.5rem; padding: 1rem; border: 1px solid #e5e7eb; cursor: pointer; transition: 0.2s; }
-        .mail-item:hover { border-color: #d1d5db; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .mail-sender { font-weight: 600; font-size: 0.9rem; color: var(--text-main); margin-bottom: 0.25rem; }
-        .mail-subject { font-size: 0.95rem; color: var(--primary); font-weight: 500; }
-        .mail-body { margin-top: 1rem; padding: 1rem; background: white; border-radius: 0.5rem; font-size: 0.9rem; color: #4b5563; display: none; white-space: pre-wrap; border: 1px solid #e5e7eb; }
-        .empty-state { text-align: center; color: var(--text-muted); padding: 2rem 0; font-size: 0.95rem; font-style: italic; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Temp Mail Pro</title><style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
 
-        @media (max-width: 480px) {
-            .btn-group { grid-template-columns: 1fr; }
-            .btn-refresh { grid-column: span 1; }
-        }
-    </style>
-</head>
-<body>
+body {
+  background: #0f172a;
+  color: #fff;
+}
 
-    <div class="container">
-        <h1>Pro Temp Mail</h1>
-        <p class="desc">Free temporary email generator (Auto-Saves Email)</p>
+header {
+  text-align: center;
+  padding: 15px;
+  background: #1e293b;
+  font-size: 22px;
+  font-weight: bold;
+}
 
-        <div class="email-display" id="emailText">Fetching email...</div>
+.container {
+  max-width: 500px;
+  margin: auto;
+  padding: 20px;
+}
 
-        <div class="btn-group">
-            <button class="btn-new" onclick="getNewEmail()">⚡ New Email</button>
-            <button class="btn-copy" id="copyBtn" onclick="copyEmail()">📋 Copy Email</button>
-            <button class="btn-refresh" onclick="refreshInbox()">🔄 Refresh Inbox</button>
-        </div>
+.box {
+  background: #1e293b;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
 
-        <div class="inbox-header">
-            <h2>Your Inbox</h2>
-            <span class="loader" id="loader">Checking for new mails...</span>
-        </div>
+input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 6px;
+  border: none;
+  text-align: center;
+  font-size: 16px;
+}
 
-        <div class="mail-list" id="inboxList">
-            <div class="empty-state">Inbox is empty. Waiting for emails...</div>
-        </div>
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 6px;
+  background: #22c55e;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #16a34a;
+}
+
+.inbox-item {
+  background: #334155;
+  padding: 10px;
+  border-radius: 6px;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.footer {
+  text-align: center;
+  font-size: 12px;
+  opacity: 0.6;
+  margin-top: 20px;
+}
+</style></head><body><header>📧 Temp Mail Pro</header><div class="container">  <div class="box">
+    <input type="text" id="email" placeholder="Click Generate Email" readonly>
+    <button onclick="generateEmail()">Generate Email</button>
+    <button onclick="copyEmail()">Copy Email</button>
+  </div>  <div class="box">
+    <h3>Inbox</h3>
+    <div id="inbox">
+      <p>No messages yet...</p>
     </div>
+    <button onclick="refreshInbox()">Refresh Inbox</button>
+  </div>  <div class="footer">
+    Simple Temp Mail Demo • GitHub Ready
+  </div></div><script>
+let currentEmail = "";
+let inboxMessages = [];
 
-    <script>
-        const API_BASE = "https://www.1secmail.com/api/v1/";
-        let userEmail = localStorage.getItem('tm_email') || "";
-        let userLogin = localStorage.getItem('tm_login') || "";
-        let userDomain = localStorage.getItem('tm_domain') || "";
+function generateEmail() {
+  const random = Math.random().toString(36).substring(2, 10);
+  const domains = ["tempmail.xyz", "mailboxy.site", "quickmail.pro"];
+  const domain = domains[Math.floor(Math.random() * domains.length)];
 
-        // Proxy Fetcher to bypass Adblockers/CORS
-        async function fetchAPI(url) {
-            try {
-                let res = await fetch(url);
-                if (res.ok) return await res.json();
-                throw new Error("Direct failed");
-            } catch (err) {
-                let proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-                let res = await fetch(proxy);
-                let data = await res.json();
-                return JSON.parse(data.contents);
-            }
-        }
+  currentEmail = random + "@" + domain;
+  document.getElementById("email").value = currentEmail;
 
-        // Generate New Email
-        async function getNewEmail() {
-            document.getElementById('emailText').innerText = "Generating...";
-            try {
-                let data = await fetchAPI(`${API_BASE}?action=genRandomMailbox&count=1`);
-                userEmail = data[0];
-                [userLogin, userDomain] = userEmail.split('@');
-                
-                localStorage.setItem('tm_email', userEmail);
-                localStorage.setItem('tm_login', userLogin);
-                localStorage.setItem('tm_domain', userDomain);
-                
-                updateUI();
-                document.getElementById('inboxList').innerHTML = '<div class="empty-state">Inbox is empty. Waiting for emails...</div>';
-            } catch (error) {
-                document.getElementById('emailText').innerText = "Network Error! Try Again.";
-            }
-        }
+  inboxMessages = [];
+  updateInbox();
+}
 
-        // Copy Email
-        function copyEmail() {
-            if (!userEmail) return;
-            navigator.clipboard.writeText(userEmail);
-            let btn = document.getElementById('copyBtn');
-            btn.innerText = "✅ Copied!";
-            btn.style.background = "var(--success)";
-            setTimeout(() => {
-                btn.innerText = "📋 Copy Email";
-                btn.style.background = "var(--primary)";
-            }, 2000);
-        }
+function copyEmail() {
+  const emailField = document.getElementById("email");
+  emailField.select();
+  emailField.setSelectionRange(0, 99999);
+  document.execCommand("copy");
+  alert("Email copied!");
+}
 
-        // Refresh Inbox
-        async function refreshInbox() {
-            if (!userLogin || !userDomain) return;
-            
-            document.getElementById('loader').style.display = "block";
-            let inboxList = document.getElementById('inboxList');
+function updateInbox() {
+  const inbox = document.getElementById("inbox");
 
-            try {
-                let mails = await fetchAPI(`${API_BASE}?action=getMessages&login=${userLogin}&domain=${userDomain}`);
-                
-                if (mails.length === 0) {
-                    inboxList.innerHTML = '<div class="empty-state">Inbox is empty. Waiting for emails...</div>';
-                } else {
-                    inboxList.innerHTML = "";
-                    mails.forEach(mail => {
-                        let div = document.createElement('div');
-                        div.className = "mail-item";
-                        div.innerHTML = `
-                            <div class="mail-sender">From: ${mail.from}</div>
-                            <div class="mail-subject">Subject: ${mail.subject || 'No Subject'}</div>
-                            <div class="mail-body" id="body-${mail.id}">Loading message...</div>
-                        `;
-                        div.onclick = () => openMail(mail.id, div);
-                        inboxList.appendChild(div);
-                    });
-                }
-            } catch (error) {
-                inboxList.innerHTML = '<div class="empty-state" style="color:red;">Failed to load inbox. Click refresh again.</div>';
-            }
-            document.getElementById('loader').style.display = "none";
-        }
+  if (inboxMessages.length === 0) {
+    inbox.innerHTML = "<p>No messages yet...</p>";
+    return;
+  }
 
-        // Open specific mail to read
-        async function openMail(id, element) {
-            let bodyDiv = document.getElementById(`body-${id}`);
-            
-            if (bodyDiv.style.display === "block") {
-                bodyDiv.style.display = "none";
-                return;
-            }
+  inbox.innerHTML = inboxMessages.map(msg => `
+    <div class="inbox-item">
+      <b>${msg.title}</b><br>
+      ${msg.body}
+    </div>
+  `).join("");
+}
 
-            bodyDiv.style.display = "block";
-            if (bodyDiv.dataset.loaded) return;
+function refreshInbox() {
+  if (!currentEmail) {
+    alert("Please generate email first!");
+    return;
+  }
 
-            try {
-                let mailData = await fetchAPI(`${API_BASE}?action=readMessage&login=${userLogin}&domain=${userDomain}&id=${id}`);
-                // Simple regex to strip HTML tags if textBody is empty
-                bodyDiv.innerText = mailData.textBody || mailData.htmlBody.replace(/<[^>]*>?/gm, '');
-                bodyDiv.dataset.loaded = "true";
-            } catch (error) {
-                bodyDiv.innerText = "Failed to load message content.";
-            }
-        }
+  const demoMessages = [
+    {title: "OTP Code", body: "Your OTP is: " + Math.floor(100000 + Math.random()*900000)},
+    {title: "Welcome", body: "Thanks for signing up!"},
+    {title: "Security Alert", body: "New login detected."},
+    {title: "Verification", body: "Click link to verify account."}
+  ];
 
-        function updateUI() {
-            if (userEmail) {
-                document.getElementById('emailText').innerText = userEmail;
-            } else {
-                getNewEmail();
-            }
-        }
+  const randomMsg = demoMessages[Math.floor(Math.random() * demoMessages.length)];
+  inboxMessages.unshift(randomMsg);
 
-        // Init
-        window.onload = () => {
-            updateUI();
-            if (userEmail) refreshInbox();
-        };
-    </script>
-
-</body>
-</html>
+  updateInbox();
+}
+</script></body>
+</html>bodyDiv.innerText
