@@ -3,270 +3,364 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Math World</title>
+    <title>Math Learn Pro</title>
     <style>
-        :root { --primary: #2563eb; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --border: #e2e8f0; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: var(--bg); color: var(--text); overflow-x: hidden; }
-
-        /* Welcome Screen */
-        #welcome-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; transition: opacity 0.5s; }
-        #welcome-screen h1 { font-size: 36px; margin-bottom: 20px; text-align: center; }
-        .start-btn { padding: 15px 40px; font-size: 20px; font-weight: bold; background: white; color: var(--primary); border: none; border-radius: 30px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .start-btn:active { transform: scale(0.95); }
-
-        /* Header & Dashboard */
-        header { background: var(--primary); color: white; padding: 15px; text-align: center; font-size: 22px; font-weight: bold; position: sticky; top: 0; z-index: 10; display: none; }
-        .container { padding: 20px; max-width: 800px; margin: auto; display: none; }
+        /* DESIGN SYSTEM & VARIABLES */
+        :root {
+            --bg: #f0f4f8; --text: #1e293b; --card: rgba(255,255,255,0.85); --card-border: rgba(255,255,255,0.5);
+            --primary: #4f46e5; --primary-hover: #4338ca; --success: #10b981; --danger: #ef4444; --warning: #f59e0b;
+            --shadow: 0 10px 25px -5px rgba(0,0,0,0.1); --glass: blur(12px);
+        }
+        .dark-mode {
+            --bg: #0f172a; --text: #f8fafc; --card: rgba(30,41,59,0.85); --card-border: rgba(255,255,255,0.1);
+            --shadow: 0 10px 25px -5px rgba(0,0,0,0.5);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text); transition: 0.3s ease; min-height: 100vh; overflow-x: hidden; padding-bottom: 30px; }
         
-        /* Grid Menu */
-        .grid-menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; }
-        .menu-card { background: var(--card); padding: 25px 15px; text-align: center; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid var(--border); font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        .menu-card:active { background: #e2e8f0; }
-        .menu-card .icon { font-size: 30px; margin-bottom: 10px; display: block; }
+        /* BACKGROUND GLOW */
+        body::before {
+            content: ''; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle at 50% 50%, rgba(79,70,229,0.08) 0%, transparent 50%);
+            z-index: -1; pointer-events: none;
+        }
 
-        /* Sections */
-        .section { display: none; animation: fadeIn 0.3s; background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border: 1px solid var(--border); }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* LAYOUT & PAGES */
+        .page { display: none; padding: 20px; max-width: 900px; margin: 0 auto; animation: fadeUp 0.4s ease; }
+        .page.active { display: block; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* HEADER */
+        .marquee { background: var(--primary); color: white; padding: 8px; font-size: 14px; font-weight: 600; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: var(--card); backdrop-filter: var(--glass); border-bottom: 1px solid var(--card-border); position: sticky; top: 0; z-index: 100; }
+        .top-bar h2 { font-weight: 800; color: var(--primary); cursor: pointer; }
+        .icon-btn { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text); padding: 5px 10px; border-radius: 8px; transition: 0.2s; }
+        .icon-btn:hover { background: rgba(128,128,128,0.1); }
+
+        /* DASHBOARD GRID */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; padding-top: 15px; }
+        .glass-card { background: var(--card); backdrop-filter: var(--glass); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px 10px; text-align: center; box-shadow: var(--shadow); cursor: pointer; transition: 0.2s; }
+        .glass-card:hover { transform: translateY(-3px); border-color: var(--primary); }
+        .glass-card .icon { font-size: 2.2rem; margin-bottom: 10px; display: block; }
+        .glass-card h3 { font-size: 1rem; font-weight: 600; }
+
+        /* CONTROLS & INPUTS */
+        .panel { background: var(--card); border: 1px solid var(--card-border); border-radius: 12px; padding: 15px; margin-bottom: 15px; display: flex; flex-wrap: wrap; gap: 10px; box-shadow: var(--shadow); }
+        input, select { flex: 1; min-width: 150px; padding: 12px; border-radius: 8px; border: 1px solid rgba(128,128,128,0.3); background: transparent; color: var(--text); font-size: 1rem; outline: none; }
+        input:focus, select:focus { border-color: var(--primary); }
+        .btn { padding: 12px 20px; border-radius: 8px; border: none; background: var(--primary); color: white; font-weight: 600; cursor: pointer; transition: 0.2s; text-align: center; }
+        .btn:hover { background: var(--primary-hover); }
+        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+
+        /* DATA LISTS */
+        .list-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; max-height: 65vh; overflow-y: auto; padding-right: 5px; }
+        .list-item { background: var(--card); border: 1px solid var(--card-border); padding: 15px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 1.1rem; font-weight: 500; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .list-item b { color: var(--primary); font-size: 1.2rem; }
         
-        .back-btn { background: #64748b; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-size: 16px; cursor: pointer; margin-bottom: 20px; width: 100%; font-weight: bold; }
-        input, select, button.action-btn { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid var(--border); font-size: 16px; }
-        button.action-btn { background: var(--primary); color: white; font-weight: bold; border: none; cursor: pointer; }
+        /* QUIZ & MOCK TEST */
+        .exam-box { background: var(--card); border-radius: 16px; padding: 25px; text-align: center; border: 1px solid var(--card-border); box-shadow: var(--shadow); }
+        .q-text { font-size: 2rem; font-weight: 800; margin: 20px 0; color: var(--primary); }
+        .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .opt-btn { padding: 15px; font-size: 1.2rem; border-radius: 10px; background: transparent; border: 2px solid var(--card-border); color: var(--text); cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .opt-btn:active { transform: scale(0.98); }
+        .opt-btn.correct { background: var(--success); color: white; border-color: var(--success); }
+        .opt-btn.wrong { background: var(--danger); color: white; border-color: var(--danger); }
 
-        /* Lists Output */
-        .list-container { max-height: 60vh; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; margin-top: 15px; background: #fafafa; }
-        .list-item { padding: 12px 15px; border-bottom: 1px solid var(--border); font-size: 18px; display: flex; justify-content: space-between; }
-        .list-item:last-child { border-bottom: none; }
-        .list-item:nth-child(even) { background: #f1f5f9; }
-
-        /* Quiz specific */
-        .quiz-box { text-align: center; margin-top: 20px; }
-        .question { font-size: 32px; font-weight: bold; margin: 20px 0; }
-        .feedback { font-size: 20px; font-weight: bold; margin-bottom: 10px; height: 30px; }
+        /* TOAST */
+        #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--text); color: var(--bg); padding: 12px 25px; border-radius: 30px; font-weight: 600; opacity: 0; transition: 0.3s; z-index: 1000; }
+        #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
     </style>
 </head>
 <body>
 
-    <div id="welcome-screen">
-        <h1>Welcome Math World</h1>
-        <button class="start-btn" onclick="enterApp()">Start Learning</button>
+    <div class="marquee" id="marquee">
+        <marquee scrollamount="5">Welcome to Math Learn Pro. Master Basics, Play Quizzes, and Crack Army GD & UP Police Exams!</marquee>
     </div>
 
-    <header id="main-header">Math World</header>
+    <div id="page-home" class="page active" style="text-align:center; padding-top:20vh;">
+        <h1 style="font-size: 3.5rem; background: linear-gradient(135deg, var(--primary), #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom:10px;">Math Learn</h1>
+        <p style="font-size:1.2rem; margin-bottom:30px; opacity:0.8;">Premium Offline Educational Suite</p>
+        <button class="btn" style="font-size:1.5rem; padding:15px 50px; border-radius:30px; box-shadow:var(--shadow);" onclick="nav('dashboard')">ENTER</button>
+    </div>
 
-    <div class="container" id="main-container">
+    <div class="top-bar" id="top-bar" style="display:none;">
+        <h2 onclick="nav('dashboard')">Math Learn</h2>
+        <div>
+            <button class="icon-btn" onclick="toggleTheme()" title="Theme">🌗</button>
+            <button class="icon-btn" onclick="nav('settings')" title="Settings">⚙️</button>
+        </div>
+    </div>
+
+    <div id="page-dashboard" class="page">
+        <h3>Master Your Mathematics</h3>
+        <div class="grid">
+            <div class="glass-card" onclick="nav('tables')"><span class="icon">✖️</span><h3>Tables</h3></div>
+            <div class="glass-card" onclick="setupDynamic('squares')"><span class="icon">🟦</span><h3>Squares</h3></div>
+            <div class="glass-card" onclick="setupDynamic('cubes')"><span class="icon">🧊</span><h3>Cubes</h3></div>
+            <div class="glass-card" onclick="setupDynamic('roots')"><span class="icon">🌱</span><h3>Roots</h3></div>
+            <div class="glass-card" onclick="nav('solver')"><span class="icon">🧮</span><h3>Smart Solver</h3></div>
+            <div class="glass-card" onclick="nav('quiz')"><span class="icon">🎯</span><h3>Speed Quiz</h3></div>
+            <div class="glass-card" onclick="nav('mock')"><span class="icon">📝</span><h3>Mock Test</h3></div>
+            <div class="glass-card" onclick="nav('papers')"><span class="icon">📄</span><h3>Prev Papers</h3></div>
+            <div class="glass-card" onclick="nav('timetable')"><span class="icon">📅</span><h3>Timetable</h3></div>
+            <div class="glass-card" onclick="nav('progress')"><span class="icon">📈</span><h3>Progress</h3></div>
+        </div>
+    </div>
+
+    <div id="page-tables" class="page">
+        <button class="btn btn-outline" onclick="nav('dashboard')" style="margin-bottom:15px;">← Back</button>
+        <h2>Multiplication Tables</h2>
+        <div class="panel">
+            <input type="number" id="t-num" placeholder="Table No. (2-1000)">
+            <input type="number" id="t-filt" placeholder="Filter Multiple (1-50)">
+            <button class="btn" onclick="genTable()">Generate</button>
+        </div>
+        <div class="list-grid" id="t-list"></div>
+    </div>
+
+    <div id="page-dynamic" class="page">
+        <button class="btn btn-outline" onclick="nav('dashboard')" style="margin-bottom:15px;">← Back</button>
+        <h2 id="dyn-title">Data</h2>
+        <div class="panel">
+            <input type="number" id="dyn-search" placeholder="Search Base Number..." oninput="filterDynamic()">
+        </div>
+        <div class="list-grid" id="dyn-list"></div>
+    </div>
+
+    <div id="page-solver" class="page">
+        <button class="btn btn-outline" onclick="nav('dashboard')" style="margin-bottom:15px;">← Back</button>
+        <h2>Smart Math Solver</h2>
+        <div class="panel">
+            <input type="text" id="solve-in" placeholder="Enter equation (e.g., 2 + 5 * 3)">
+            <button class="btn" onclick="solveEquation()">Solve Step-by-Step</button>
+        </div>
+        <div class="exam-box" id="solve-out" style="text-align:left; font-size:1.1rem; line-height:1.6; display:none;"></div>
+    </div>
+
+    <div id="page-quiz" class="page">
+        <button class="btn btn-outline" onclick="nav('dashboard')" style="margin-bottom:15px;">← Back</button>
         
-        <div id="dashboard" class="grid-menu">
-            <div class="menu-card" onclick="openSection('tables')"><span class="icon">✖️</span> Tables</div>
-            <div class="menu-card" onclick="openSection('squares')"><span class="icon">🟦</span> Squares</div>
-            <div class="menu-card" onclick="openSection('cubes')"><span class="icon">🧊</span> Cubes</div>
-            <div class="menu-card" onclick="openSection('roots')"><span class="icon">🌱</span> Roots</div>
-            <div class="menu-card" onclick="openSection('roman')"><span class="icon">🏛️</span> Roman Numbers</div>
-            <div class="menu-card" onclick="openSection('names')"><span class="icon">🔠</span> Number Names</div>
-            <div class="menu-card" onclick="openSection('quiz')"><span class="icon">📝</span> Math Quiz</div>
-        </div>
-
-        <div id="sec-tables" class="section">
-            <button class="back-btn" onclick="goBack()">🔙 Back to Menu</button>
-            <h2>Multiplication Tables (1 to 1000)</h2>
-            <input type="number" id="table-num" placeholder="Enter number (e.g. 12)" min="1" max="1000">
-            <button class="action-btn" onclick="generateTable()">Show Table up to 50</button>
-            <div id="table-out" class="list-container"></div>
-        </div>
-
-        <div id="sec-squares" class="section">
-            <button class="back-btn" onclick="goBack()">🔙 Back to Menu</button>
-            <h2>Squares (1 to 1000)</h2>
-            <div id="square-out" class="list-container"></div>
-        </div>
-
-        <div id="sec-cubes" class="section">
-            <button class="back-btn" onclick="goBack()">🔙 Back to Menu</button>
-            <h2>Cubes (1 to 1000)</h2>
-            <div id="cube-out" class="list-container"></div>
-        </div>
-
-        <div id="sec-roots" class="section">
-            <button class="back-btn" onclick="goBack()">🔙 Back to Menu</button>
-            <h2>Square Roots (1 to 1000)</h2>
-            <div id="root-out" class="list-container"></div>
-        </div>
-
-        <div id="sec-roman" class="section">
-            <button class="back-btn" onclick="goBack()">🔙 Back to Menu</button>
-            <h2>Roman Numerals (1 to 1000)</h2>
-            <div id="roman-out" class="list-container"></div>
-        </div>
-
-        <div id="sec-names" class="section">
-            <button class="back-btn" onclick="goBack()">🔙 Back to Menu</button>
-            <h2>Number Names (1 to 1000)</h2>
-            <div id="name-out" class="list-container"></div>
-        </div>
-
-        <div id="sec-quiz" class="section">
-            <button class="back-btn" onclick="goBack()">🔙 Back to Menu</button>
-            <h2>Math Quiz</h2>
-            <select id="quiz-mode" onchange="resetQuiz()">
-                <option value="beginner">Beginner (Addition/Subtraction 1-20)</option>
-                <option value="normal">Normal (Multiplication 1-20)</option>
-                <option value="hard">Hard (Advanced Multiplication & Squares)</option>
+        <div id="quiz-setup" class="exam-box">
+            <h2>Math Speed Quiz</h2>
+            <select id="q-cat" style="width:100%; margin:15px 0;">
+                <option value="mix">Mixed Operations</option>
+                <option value="mult">Multiplication & Tables</option>
+                <option value="add">Addition & Subtraction</option>
             </select>
-            <div class="quiz-box">
-                <div class="feedback" id="quiz-feedback"></div>
-                <div class="question" id="quiz-question">Press Start!</div>
-                <input type="number" id="quiz-answer" placeholder="Your Answer">
-                <button class="action-btn" onclick="checkQuiz()">Submit Answer</button>
-                <button class="action-btn" style="background:#16a34a; margin-top:10px;" onclick="nextQuestion()">Start / Next Question</button>
-            </div>
+            <button class="btn" style="width:100%;" onclick="startQuiz()">Start 60s Challenge</button>
         </div>
 
+        <div id="quiz-play" class="exam-box" style="display:none;">
+            <div style="display:flex; justify-content:space-between; font-weight:bold; color:var(--primary);">
+                <span id="q-score">Score: 0</span>
+                <span id="q-timer" style="color:var(--danger)">⏱ 60s</span>
+            </div>
+            <div class="q-text" id="q-text">5 × 8 = ?</div>
+            <div class="opt-grid" id="q-options"></div>
+        </div>
+
+        <div id="quiz-result" class="exam-box" style="display:none;">
+            <h2 id="qr-title">Time's Up!</h2>
+            <div class="q-text" id="qr-score">Score: 0</div>
+            <button class="btn" onclick="nav('dashboard')">Finish</button>
+        </div>
     </div>
+
+    <div id="page-mock" class="page">
+        <button class="btn btn-outline" onclick="nav('dashboard')" style="margin-bottom:15px;">← Back</button>
+        
+        <div id="mock-setup" class="exam-box">
+            <h2>Army GD & UP Police Mock</h2>
+            <p>5 Questions | +2 for Correct | -0.5 for Wrong</p>
+            <button class="btn" style="width:100%; margin-top:15px;" onclick="startMock()">Start Mock Test</button>
+        </div>
+
+        <div id="mock-play" class="exam-box" style="display:none;">
+            <div style="display:flex; justify-content:space-between; font-weight:bold;">
+                <span id="m-count">Q 1/5</span>
+                <span style="color:var(--warning)">Mock Test Running</span>
+            </div>
+            <div class="q-text" id="m-text" style="font-size:1.5rem;">Question...</div>
+            <div class="opt-grid" id="m-options"></div>
+        </div>
+
+        <div id="mock-result" class="exam-box" style="display:none;">
+            <h2>Mock Test Report</h2>
+            <div id="mr-stats" style="font-size:1.2rem; line-height:1.8; margin:20px 0; text-align:left;"></div>
+            <button class="btn" onclick="nav('dashboard')">Return to Dashboard</button>
+        </div>
+    </div>
+
+    <div id="page-papers" class="page">
+        <button class="btn btn-outline" onclick="nav('dashboard')" style="margin-bottom:15px;">← Back</button>
+        <h2>Previous Year Vault</h2>
+        <div class="panel">
+            <select id="paper-select" onchange="loadPaper()">
+                <option value="">Select Exam Paper...</option>
+                <option value="army">Army Agniveer GD 2024 (Maths)</option>
+                <option value="up">UP Police Constable 2023 (Maths)</option>
+            </select>
+        </div>
+        <div id="paper-content" style="display:none;"></div>
+    </div>
+
+    <div id="page-timetable" class="page">
+        <button class="btn btn-outline" onclick="nav('dashboard')" style="margin-bottom:15px;">← Back</button>
+        <h2>Study Timetable</h2>
+        <div class="panel">
+            <input type="text" id="tt-task" placeholder="E.g., Practice Percentage">
+            <input type="time" id="tt-time">
+            <button class="btn" onclick="addTask()">Add</button>
+        </div>
+        <div id="tt-list"></div>
+    </div>
+
+    <div id="page-progress" class="page">
+        <button class="btn btn-outline" onclick="nav('dashboard')" style="margin-bottom:15px;">← Back</button>
+        <h2>Your Progress</h2>
+        <div class="grid">
+            <div class="glass-card"><h3 id="p-streak" style="font-size:2rem; color:var(--primary);">1</h3><p>Day Streak 🔥</p></div>
+            <div class="glass-card"><h3 id="p-score" style="font-size:2rem; color:var(--success);">0</h3><p>High Score 🏆</p></div>
+        </div>
+    </div>
+
+    <div id="page-settings" class="page">
+        <button class="btn btn-outline" onclick="nav('dashboard')" style="margin-bottom:15px;">← Back</button>
+        <h2>Settings</h2>
+        <div class="panel" style="flex-direction:column;">
+            <button class="btn btn-outline" onclick="toggleTheme()">🌗 Toggle Dark Mode</button>
+            <button class="btn" style="background:var(--danger);" onclick="resetData()">🗑️ Reset All Data</button>
+        </div>
+    </div>
+
+    <div id="toast">Message</div>
 
     <script>
-        // App Flow Logic
-        function enterApp() {
-            document.getElementById('welcome-screen').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('welcome-screen').style.display = 'none';
-                document.getElementById('main-header').style.display = 'block';
-                document.getElementById('main-container').style.display = 'block';
-                document.getElementById('dashboard').style.display = 'grid';
-            }, 500);
+        /* --- CORE SYSTEM --- */
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg; t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
         }
 
-        function openSection(secId) {
-            document.getElementById('dashboard').style.display = 'none';
-            document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
-            document.getElementById('sec-' + secId).style.display = 'block';
-            
-            // Auto-generate lists to prevent initial app lag
-            if(secId === 'squares') generateList('square');
-            if(secId === 'cubes') generateList('cube');
-            if(secId === 'roots') generateList('root');
-            if(secId === 'roman') generateList('roman');
-            if(secId === 'names') generateList('name');
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('ml_theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
         }
 
-        function goBack() {
-            document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
-            document.getElementById('dashboard').style.display = 'grid';
-        }
-
-        // Feature 1: Tables (1 to 50)
-        function generateTable() {
-            let num = parseInt(document.getElementById('table-num').value);
-            if(!num || num < 1) return;
-            let html = "";
-            for(let i = 1; i <= 50; i++) {
-                html += `<div class="list-item"><span>${num} × ${i}</span> <b>${num * i}</b></div>`;
+        function nav(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            if(page === 'dashboard') {
+                document.getElementById('top-bar').style.display = 'flex';
+                document.getElementById('marquee').style.display = 'none';
             }
-            document.getElementById('table-out').innerHTML = html;
+            if(page === 'quiz') document.getElementById('quiz-setup').style.display = 'block';
+            if(page === 'mock') document.getElementById('mock-setup').style.display = 'block';
+            
+            document.getElementById('page-' + page).classList.add('active');
+            window.scrollTo(0,0);
         }
 
-        // Generator Logic for Lists (Fast String Building)
-        function generateList(type) {
-            let container = document.getElementById(type + '-out');
-            if(container.innerHTML !== "") return; // Already generated
+        window.onload = () => {
+            if(localStorage.getItem('ml_theme') === 'dark') document.body.classList.add('dark-mode');
+            loadTasks(); updateStats();
+        }
+
+        /* --- TABLES --- */
+        function genTable() {
+            let n = parseInt(document.getElementById('t-num').value);
+            let f = document.getElementById('t-filt').value;
+            if(!n || n < 2) return showToast("Enter valid table number!");
             
             let html = "";
-            for(let i = 1; i <= 1000; i++) {
-                if(type === 'square') html += `<div class="list-item"><span>${i}²</span> <b>${i * i}</b></div>`;
-                if(type === 'cube') html += `<div class="list-item"><span>${i}³</span> <b>${i * i * i}</b></div>`;
-                if(type === 'root') html += `<div class="list-item"><span>√${i}</span> <b>${Math.sqrt(i).toFixed(3)}</b></div>`;
-                if(type === 'roman') html += `<div class="list-item"><span>${i}</span> <b>${toRoman(i)}</b></div>`;
-                if(type === 'name') html += `<div class="list-item"><span>${i}</span> <b>${toWords(i)}</b></div>`;
-            }
-            container.innerHTML = html;
-        }
-
-        // Helper: Number to Roman
-        function toRoman(num) {
-            const val = [1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1];
-            const syb = ["M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"];
-            let roman = "";
-            for (let i = 0; i < val.length; i++) {
-                while (num >= val[i]) { roman += syb[i]; num -= val[i]; }
-            }
-            return roman;
-        }
-
-        // Helper: Number to Words (Up to 1000)
-        function toWords(n) {
-            const a = ['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
-            const b = ['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
-            if(n === 1000) return "One Thousand";
-            let str = '';
-            if(n >= 100) { str += a[Math.floor(n/100)] + " Hundred "; n %= 100; }
-            if(n > 0) {
-                if(n < 20) str += a[n];
-                else str += b[Math.floor(n/10)] + (n%10 !== 0 ? " " + a[n%10] : "");
-            }
-            return str.trim();
-        }
-
-        // Feature: Math Quiz Logic
-        let quizAns = 0;
-        
-        function resetQuiz() {
-            document.getElementById('quiz-question').innerText = "Press Start!";
-            document.getElementById('quiz-feedback').innerText = "";
-            document.getElementById('quiz-answer').value = "";
-        }
-
-        function nextQuestion() {
-            const mode = document.getElementById('quiz-mode').value;
-            let qStr = "";
-            let num1, num2;
-
-            if(mode === 'beginner') {
-                num1 = Math.floor(Math.random() * 20) + 1;
-                num2 = Math.floor(Math.random() * 10) + 1;
-                let isAdd = Math.random() > 0.5;
-                if(isAdd) { quizAns = num1 + num2; qStr = `${num1} + ${num2} = ?`; }
-                else { 
-                    if(num1 < num2) [num1, num2] = [num2, num1]; // Keep positive
-                    quizAns = num1 - num2; qStr = `${num1} - ${num2} = ?`; 
-                }
-            } 
-            else if(mode === 'normal') {
-                num1 = Math.floor(Math.random() * 20) + 1;
-                num2 = Math.floor(Math.random() * 10) + 1;
-                quizAns = num1 * num2;
-                qStr = `${num1} × ${num2} = ?`;
-            } 
-            else if(mode === 'hard') {
-                let isSquare = Math.random() > 0.7;
-                if(isSquare) {
-                    num1 = Math.floor(Math.random() * 30) + 1;
-                    quizAns = num1 * num1;
-                    qStr = `${num1}² = ?`;
-                } else {
-                    num1 = Math.floor(Math.random() * 50) + 10;
-                    num2 = Math.floor(Math.random() * 20) + 2;
-                    quizAns = num1 * num2;
-                    qStr = `${num1} × ${num2} = ?`;
-                }
-            }
-
-            document.getElementById('quiz-question').innerText = qStr;
-            document.getElementById('quiz-answer').value = '';
-            document.getElementById('quiz-feedback').innerText = "";
-            document.getElementById('quiz-answer').focus();
-        }
-
-        function checkQuiz() {
-            let userAns = parseInt(document.getElementById('quiz-answer').value);
-            let feedback = document.getElementById('quiz-feedback');
-            if(isNaN(userAns)) return;
-
-            if(userAns === quizAns) {
-                feedback.innerHTML = `<span style="color:#16a34a;">Correct! 🎉</span>`;
-                setTimeout(nextQuestion, 1000);
+            if(f && f > 0) {
+                html = `<div class="list-item"><span>${n} × ${f}</span> <b>${n*f}</b></div>`;
             } else {
-                feedback.innerHTML = `<span style="color:#dc2626;">Wrong! Correct answer is ${quizAns}</span>`;
+                for(let i=1; i<=50; i++) html += `<div class="list-item"><span>${n} × ${i}</span> <b>${n*i}</b></div>`;
+            }
+            document.getElementById('t-list').innerHTML = html;
+        }
+
+        /* --- DYNAMIC (Squares, Cubes, Roots) --- */
+        let currDyn = '';
+        function setupDynamic(mode) {
+            currDyn = mode;
+            document.getElementById('dyn-search').value = '';
+            document.getElementById('dyn-title').innerText = mode.charAt(0).toUpperCase() + mode.slice(1);
+            nav('dynamic'); filterDynamic();
+        }
+        function filterDynamic() {
+            let f = document.getElementById('dyn-search').value.trim();
+            let html = ""; let count = 0;
+            for(let i=1; i<=1000; i++) {
+                if(f && !i.toString().startsWith(f)) continue;
+                if(count > 100) break; // Prevent lag
+                
+                let v = currDyn==='squares' ? i*i : currDyn==='cubes' ? i*i*i : Math.sqrt(i).toFixed(3);
+                let sym = currDyn==='squares' ? '²' : currDyn==='cubes' ? '³' : '√';
+                html += `<div class="list-item"><span>${currDyn==='roots'?sym+i:i+sym}</span> <b>${v}</b></div>`;
+                count++;
+            }
+            document.getElementById('dyn-list').innerHTML = html;
+        }
+
+        /* --- SMART SOLVER (BODMAS) --- */
+        function solveEquation() {
+            let eq = document.getElementById('solve-in').value;
+            let out = document.getElementById('solve-out');
+            if(!eq) return showToast("Enter an equation");
+            try {
+                // Safe basic math evaluation
+                let sanitized = eq.replace(/[^0-9+\-*/(). ]/g, ''); 
+                let ans = Function('"use strict";return (' + sanitized + ')')();
+                out.style.display = 'block';
+                out.innerHTML = `
+                    <div style="color:var(--primary); margin-bottom:10px;"><b>Rule: BODMAS applied</b></div>
+                    <div><b>Equation:</b> ${sanitized}</div>
+                    <div style="font-size:1.5rem; color:var(--success); margin-top:10px;"><b>Answer = ${ans}</b></div>
+                `;
+            } catch(e) {
+                showToast("Invalid Equation. Use basic operators (+, -, *, /)");
             }
         }
-    </script>
-</body>
-</html>
+
+        /* --- SPEED QUIZ --- */
+        let qTime, qTimer, qScore, qAns;
+        function startQuiz() {
+            document.getElementById('quiz-setup').style.display = 'none';
+            document.getElementById('quiz-play').style.display = 'block';
+            document.getElementById('quiz-result').style.display = 'none';
+            qScore = 0; qTime = 60;
+            nextQ();
+            
+            clearInterval(qTimer);
+            qTimer = setInterval(() => {
+                qTime--;
+                document.getElementById('q-timer').innerText = `⏱ ${qTime}s`;
+                if(qTime <= 0) endQuiz();
+            }, 1000);
+        }
+
+        function nextQ() {
+            let cat = document.getElementById('q-cat').value;
+            document.getElementById('q-score').innerText = `Score: ${qScore}`;
+            
+            let n1 = Math.floor(Math.random() * 15) + 2;
+            let n2 = Math.floor(Math.random() * 10) + 1;
+            
+            if(cat === 'mult' || (cat==='mix' && Math.random()>0.5)) {
+                qAns = n1 * n2; document.getElementById('q-text').innerText = `${n1} × ${n2} = ?`;
+            } else {
+                n1 = n1 * 4; qAns = n1 + n2; document.getElementById('q-text').innerText = `${n1} + ${n2} = ?`;
+            }
+            
+            let opts = [qAns];
+            while(opts.length < 4) {
+                let f = qAns + (Math.floor(Math.random() * 20) - 10);
+                if(!opts.includes(f) && f > 0) opts.push(f);
+            }
+            opts.sort(() => Math.random() - 0.5);
+            
+            let grid = document.getElementById('q-options');
+            grid.innerHTML = '';
+           
